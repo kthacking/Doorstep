@@ -102,38 +102,46 @@ $current_status_index = array_search($booking['status'], $statuses);
 
             <!-- Documents Section -->
             <div class="card" style="margin-bottom: 2rem;">
-                <h3>Documents & Checklist</h3>
-                <hr style="margin: 1.5rem 0; opacity: 0.1;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.25rem;">Verification Checklist</h3>
+                    <span class="document-badge"><i class="fas fa-shield-alt"></i> Official Verification</span>
+                </div>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                    <div>
-                        <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 1rem;">Initially Required</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div style="background: #f8fafc; padding: 1.25rem; border-radius: 12px;">
+                        <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 1rem; letter-spacing: 0.05em;">Base Documents</h4>
                         <ul style="list-style: none; padding: 0;">
                             <?php 
                             $initial_docs = explode(',', $booking['initial_docs']);
                             foreach($initial_docs as $doc): ?>
-                                <li style="margin-bottom: 0.8rem; display: flex; gap: 0.5rem; font-size: 0.9rem;">
-                                    <i class="fas fa-file-alt" style="color: var(--secondary);"></i>
+                                <li style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; font-weight: 500;">
+                                    <i class="fas fa-check-circle" style="color: var(--success); font-size: 0.9rem;"></i>
                                     <span><?php echo trim($doc); ?></span>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
                     </div>
-                    <div>
-                        <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 1rem;">Agent's Dynamic Checklist</h4>
+                    <div style="background: #f8fafc; padding: 1.25rem; border-radius: 12px;">
+                        <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 1rem; letter-spacing: 0.05em;">Agent Requirements</h4>
                         <ul style="list-style: none; padding: 0;">
                             <?php 
                             $dyn_docs = explode(',', $booking['dynamic_checklist']);
+                            $has_dyn = false;
                             foreach($dyn_docs as $doc): 
                                 if(empty(trim($doc))) continue;
+                                $has_dyn = true;
                             ?>
-                                <li style="margin-bottom: 0.8rem; display: flex; gap: 0.5rem; font-size: 0.9rem;">
-                                    <i class="fas fa-plus-circle" style="color: var(--primary);"></i>
+                                <li style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; font-weight: 500;">
+                                    <?php if($booking['agent_doc_confirmed']): ?>
+                                        <i class="fas fa-check-circle" style="color: var(--success); font-size: 0.9rem;"></i>
+                                    <?php else: ?>
+                                        <i class="fas fa-plus-circle" style="color: var(--primary); font-size: 0.9rem;"></i>
+                                    <?php endif; ?>
                                     <span><?php echo trim($doc); ?></span>
                                 </li>
                             <?php endforeach; ?>
-                            <?php if(empty(array_filter($dyn_docs))): ?>
-                                <li style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">No additional documents added by agent yet.</li>
+                            <?php if(!$has_dyn): ?>
+                                <li style="color: #94a3b8; font-size: 0.8rem; font-style: italic; padding-top: 0.5rem;">No additional requirements yet.</li>
                             <?php endif; ?>
                         </ul>
                     </div>
@@ -178,20 +186,51 @@ $current_status_index = array_search($booking['status'], $statuses);
                 </div>
 
                 <?php if($booking['user_doc_confirmed'] && $booking['agent_doc_confirmed']): ?>
-                    <div style="margin-top: 2rem; background: rgba(34, 197, 94, 0.1); padding: 1rem; border-radius: 10px; display: flex; align-items: center; gap: 1rem;">
-                        <i class="fas fa-file-signature" style="color: var(--success); font-size: 1.5rem;"></i>
+                    <div style="margin-top: 2rem; background: rgba(34, 197, 94, 0.1); padding: 1.25rem; border-radius: 12px; display: flex; align-items: center; gap: 1rem;">
+                        <i class="fas fa-file-signature" style="color: var(--success); font-size: 1.8rem;"></i>
                         <div style="flex: 1;">
-                            <strong style="color: var(--success);">Submission Verified!</strong>
-                            <p style="font-size: 0.85rem; color: #166534;">The acknowledgment receipt is now available for download.</p>
+                            <strong style="color: var(--success); font-size: 1rem;">Submission Verified!</strong>
+                            <p style="font-size: 0.85rem; color: #166534; margin-top: 2px;">The acknowledgment receipt is now available for download.</p>
                         </div>
-                        <a href="../agent/generate_receipt.php?id=<?php echo $booking['id']; ?>" target="_blank" class="btn btn-primary"><i class="fas fa-download"></i> Download Receipt</a>
+                        <a href="../agent/generate_receipt.php?id=<?php echo $booking['id']; ?>" target="_blank" class="btn btn-primary" style="box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);"><i class="fas fa-download"></i> Receipt</a>
                     </div>
                 <?php else: ?>
-                    <div style="margin-top: 2rem; background: #fffbeb; padding: 1rem; border-radius: 10px; display: flex; align-items: center; gap: 1rem;">
-                        <i class="fas fa-lock" style="color: #b45309; font-size: 1.5rem;"></i>
-                        <p style="font-size: 0.85rem; color: #92400e;">Receipt access is locked until both parties confirm document submission.</p>
+                    <div style="margin-top: 2rem; background: #fffbeb; padding: 1.25rem; border-radius: 12px; display: flex; align-items: center; gap: 1rem; border: 1px solid #fde68a;">
+                        <i class="fas fa-lock" style="color: #d97706; font-size: 1.8rem;"></i>
+                        <div style="flex: 1;">
+                            <strong style="color: #92400e; font-size: 0.9rem;">Waiting for Verification</strong>
+                            <p style="font-size: 0.8rem; color: #b45309; margin-top: 2px;">Receipt will be unlocked once the agent confirms document handover.</p>
+                        </div>
                     </div>
                 <?php endif; ?>
+            </div>
+
+            <!-- Next Steps Section -->
+            <div class="card" style="margin-top: 2rem; border: none; background: linear-gradient(to bottom, #ffffff, #f8fafc);">
+                <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem;"><i class="fas fa-paper-plane" style="color: var(--primary);"></i> What Happens Next?</h3>
+                <div style="display: grid; gap: 1rem;">
+                    <div style="display: flex; gap: 1rem;">
+                        <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0;">1</div>
+                        <div>
+                            <p style="font-size: 0.85rem; font-weight: 600;">Government Submission</p>
+                            <p style="font-size: 0.8rem; color: var(--secondary);">Agent submits your application to the respective department within 24 hours.</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <div style="width: 24px; height: 24px; border-radius: 50%; background: #e2e8f0; color: var(--secondary); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0;">2</div>
+                        <div>
+                            <p style="font-size: 0.85rem; font-weight: 600; color: var(--secondary);">Internal Verification</p>
+                            <p style="font-size: 0.8rem; color: var(--secondary);">The department verifies documents (takes <?php echo $booking['estimated_days'] ?? '5-7'; ?> business days).</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <div style="width: 24px; height: 24px; border-radius: 50%; background: #e2e8f0; color: var(--secondary); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0;">3</div>
+                        <div>
+                            <p style="font-size: 0.85rem; font-weight: 600; color: var(--secondary);">Approval & Dispatch</p>
+                            <p style="font-size: 0.8rem; color: var(--secondary);">Your final certificate/card will be dispatched to your registered address.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -199,25 +238,50 @@ $current_status_index = array_search($booking['status'], $statuses);
         <div>
             <!-- Agent Profile Card -->
             <?php if($booking['agent_id']): ?>
-                <div class="card" style="margin-bottom: 2rem; text-align: center;">
-                    <div class="agent-thumb" style="width: 100px; height: 100px; font-size: 2.5rem; margin: 0 auto 1.5rem;">
-                        <i class="fas fa-user-tie"></i>
-                    </div>
-                    <h2><?php echo $booking['agent_name']; ?></h2>
-                    <span style="background: var(--primary); color: white; padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Professional Agent</span>
-                    <p style="color: var(--secondary); font-size: 0.9rem; margin: 1rem 0;"><?php echo $booking['agent_gender']; ?></p>
-                    <hr style="margin: 1.5rem 0; opacity: 0.1;">
-                    <div style="text-align: left; font-size: 0.85rem;">
-                        <h4 style="text-transform: uppercase; color: var(--secondary); font-size: 0.7rem; margin-bottom: 0.5rem;">Bio</h4>
-                        <p style="margin-bottom: 1.5rem; line-height: 1.4;"><?php echo $booking['agent_profile'] ?: 'Official verification expert assigned to your region.'; ?></p>
-                        
-                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                            <a href="tel:<?php echo $booking['agent_phone']; ?>" class="btn" style="flex: 1; text-align: center; background: #e2e8f0; color: var(--dark); padding: 0.5rem;"><i class="fas fa-phone"></i> Call</a>
-                            <a href="https://wa.me/<?php echo $booking['agent_phone']; ?>" target="_blank" class="btn" style="flex: 1; text-align: center; background: #25D366; color: white; padding: 0.5rem;"><i class="fab fa-whatsapp"></i> Chat</a>
+                <div class="card" style="margin-bottom: 2rem; padding: 2rem 1.5rem; text-align: center; border: none; background: white; box-shadow: 0 15px 30px -10px rgba(0,0,0,0.05);">
+                    <div style="position: relative; width: 110px; height: 110px; margin: 0 auto 1.5rem;">
+                        <div class="agent-thumb" style="width: 100%; height: 100%; font-size: 3rem; background: linear-gradient(135deg, var(--primary), #818cf8); color: white; border: 4px solid #f8fafc; box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);">
+                            <?php 
+                                $name_parts = explode(' ', $booking['agent_name']);
+                                echo strtoupper(substr($name_parts[0], 0, 1) . (isset($name_parts[1]) ? substr($name_parts[1], 0, 1) : ''));
+                            ?>
                         </div>
+                        <div style="position: absolute; bottom: 5px; right: 5px; width: 22px; height: 22px; background: var(--success); border: 3px solid white; border-radius: 50%;"></div>
+                    </div>
+                    
+                    <h2 style="font-size: 1.4rem; margin-bottom: 0.25rem;"><?php echo $booking['agent_name']; ?></h2>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 1rem;">
+                        <span style="background: rgba(99, 102, 241, 0.1); color: var(--primary); padding: 4px 12px; border-radius: 50px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">Certified Agent</span>
+                        <div style="color: #fbbf24; font-size: 0.8rem;"><i class="fas fa-star"></i> 4.9</div>
+                    </div>
+                    
+                    <div style="background: #f8fafc; padding: 1rem; border-radius: 12px; text-align: left; margin-bottom: 1.5rem;">
+                        <h4 style="text-transform: uppercase; color: #94a3b8; font-size: 0.6rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: 0.05em;">Professional Bio</h4>
+                        <p style="font-size: 0.8rem; line-height: 1.6; color: #475569; position: relative; padding-left: 1rem;">
+                            <i class="fas fa-quote-left" style="position: absolute; left: 0; top: 3px; font-size: 0.6rem; color: #cbd5e1;"></i>
+                            <?php echo $booking['agent_profile'] ?: 'Official verification expert assigned to handle your documentation and government submission process.'; ?>
+                        </p>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                        <a href="tel:<?php echo $booking['agent_phone']; ?>" class="btn" style="background: #f1f5f9; color: var(--dark); font-size: 0.8rem; font-weight: 700; padding: 0.6rem;"><i class="fas fa-phone"></i> Call</a>
+                        <a href="https://wa.me/<?php echo $booking['agent_phone']; ?>" target="_blank" class="btn" style="background: #25D366; color: white; font-size: 0.8rem; font-weight: 700; padding: 0.6rem;"><i class="fab fa-whatsapp"></i> Chat</a>
                     </div>
                 </div>
-            <?php else: ?>
+
+                <!-- Feedback Section -->
+                <div class="card" style="margin-bottom: 2rem; border: 1px solid #f1f5f9; background: #fafafa;">
+                    <h4 style="font-size: 0.8rem; margin-bottom: 1rem;">Rate your experience</h4>
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; font-size: 1.5rem; color: #e2e8f0; margin-bottom: 1rem;">
+                        <i class="fas fa-star" style="cursor: pointer;"></i>
+                        <i class="fas fa-star" style="cursor: pointer;"></i>
+                        <i class="fas fa-star" style="cursor: pointer;"></i>
+                        <i class="fas fa-star" style="cursor: pointer;"></i>
+                        <i class="fas fa-star" style="cursor: pointer;"></i>
+                    </div>
+                    <button class="btn" style="width: 100%; font-size: 0.75rem; background: transparent; border: 1px solid #e2e8f0; color: var(--secondary);">Write a review</button>
+                </div>
+<?php else: ?>
                 <div class="card" style="background: #fffbeb; text-align: center;">
                     <i class="fas fa-user-secret" style="font-size: 3rem; color: #f59e0b; margin-bottom: 1rem;"></i>
                     <h3>Finding Agent</h3>
