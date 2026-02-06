@@ -3,7 +3,7 @@
         <p style="font-size: 0.8rem; margin-top: 0.5rem;">Built for Doorstep Government Service Assistance</p>
         <?php if (!isset($_SESSION['role'])): ?>
             <div style="margin-top: 1.5rem;">
-                <a href="/project/foodapp/pages/doorstepcare.php" style="color: var(--primary); font-size: 0.85rem; text-decoration: none;">Join as an Agent (DoorstepCare)</a>
+                <a href="/project/Doorstep/pages/doorstepcare.php" style="color: var(--primary); font-size: 0.85rem; text-decoration: none;">Join as an Agent (DoorstepCare)</a>
             </div>
         <?php endif; ?>
     </footer>
