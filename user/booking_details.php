@@ -272,14 +272,45 @@ $current_status_index = array_search($booking['status'], $statuses);
                 <!-- Feedback Section -->
                 <div class="card" style="margin-bottom: 2rem; border: 1px solid #f1f5f9; background: #fafafa;">
                     <h4 style="font-size: 0.8rem; margin-bottom: 1rem;">Rate your experience</h4>
-                    <div style="display: flex; gap: 0.5rem; justify-content: center; font-size: 1.5rem; color: #e2e8f0; margin-bottom: 1rem;">
-                        <i class="fas fa-star" style="cursor: pointer;"></i>
-                        <i class="fas fa-star" style="cursor: pointer;"></i>
-                        <i class="fas fa-star" style="cursor: pointer;"></i>
-                        <i class="fas fa-star" style="cursor: pointer;"></i>
-                        <i class="fas fa-star" style="cursor: pointer;"></i>
+                    <div id="star-rating" style="display: flex; gap: 0.5rem; justify-content: center; font-size: 1.5rem; color: #e2e8f0; margin-bottom: 1rem;">
+                        <i class="fas fa-star" data-rating="1" style="cursor: pointer; transition: color 0.2s;"></i>
+                        <i class="fas fa-star" data-rating="2" style="cursor: pointer; transition: color 0.2s;"></i>
+                        <i class="fas fa-star" data-rating="3" style="cursor: pointer; transition: color 0.2s;"></i>
+                        <i class="fas fa-star" data-rating="4" style="cursor: pointer; transition: color 0.2s;"></i>
+                        <i class="fas fa-star" data-rating="5" style="cursor: pointer; transition: color 0.2s;"></i>
                     </div>
                     <button class="btn" style="width: 100%; font-size: 0.75rem; background: transparent; border: 1px solid #e2e8f0; color: var(--secondary);">Write a review</button>
+                    
+                    <script>
+                        const stars = document.querySelectorAll('#star-rating .fa-star');
+                        let currentRating = 0;
+
+                        stars.forEach(star => {
+                            star.addEventListener('mouseover', () => {
+                                highlightStars(star.dataset.rating);
+                            });
+
+                            star.addEventListener('mouseout', () => {
+                                highlightStars(currentRating);
+                            });
+
+                            star.addEventListener('click', () => {
+                                currentRating = star.dataset.rating;
+                                highlightStars(currentRating);
+                                alert("Thank you for rating " + currentRating + " stars!");
+                            });
+                        });
+
+                        function highlightStars(rating) {
+                            stars.forEach(s => {
+                                if (s.dataset.rating <= rating) {
+                                    s.style.color = '#fbbf24';
+                                } else {
+                                    s.style.color = '#e2e8f0';
+                                }
+                            });
+                        }
+                    </script>
                 </div>
 <?php else: ?>
                 <div class="card" style="background: #fffbeb; text-align: center;">
