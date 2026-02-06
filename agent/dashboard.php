@@ -59,14 +59,14 @@ $assignments = $stmt->fetchAll();
                                     <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--secondary);">Document Checklist</h4>
                                     <button onclick="addDoc(<?php echo $task['id']; ?>)" class="btn" style="padding: 2px 8px; font-size: 0.65rem; background: var(--primary); color: white;">+ Add Item</button>
                                 </div>
-                                <div id="checklist-<?php echo $task['id']; ?>" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;">
+                                <div id="checklist-<?php echo $task['id']; ?>" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
                                     <?php 
                                     $docs = explode(',', $task['dynamic_checklist']);
                                     foreach($docs as $doc): 
                                         if (empty(trim($doc))) continue;
                                     ?>
-                                        <div style="font-size: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
-                                            <i class="far fa-circle" style="color: var(--primary); cursor: pointer;" onclick="markDone(this)"></i>
+                                        <div class="checklist-item">
+                                            <i class="far fa-circle checklist-icon" style="color: var(--primary);" onclick="markDone(this)"></i>
                                             <span><?php echo trim($doc); ?></span>
                                         </div>
                                     <?php endforeach; ?>
@@ -94,12 +94,8 @@ $assignments = $stmt->fetchAll();
                                 elseif ($status == 'Completed') $current_step = 4;
                                 ?>
                                 <div class="progress-stepper-mini">
-                                    <div class="progress-line-mini">
-                                        <div class="progress-line-fill-mini" style="width: <?php echo ($current_step / (count($steps)-1)) * 100; ?>%;"></div>
-                                    </div>
                                     <?php foreach ($steps as $idx => $s_name): ?>
                                         <div class="progress-step-mini <?php echo ($idx < $current_step) ? 'completed' : (($idx == $current_step) ? 'active' : ''); ?>">
-                                            <div class="progress-dot-mini"></div>
                                             <span class="progress-label-mini"><?php echo $s_name; ?></span>
                                         </div>
                                     <?php endforeach; ?>
@@ -135,30 +131,31 @@ $assignments = $stmt->fetchAll();
 
 <script>
 function markDone(el) {
-    if (el.classList.contains('fa-circle')) {
-        el.classList.remove('fa-circle', 'far');
-        el.classList.add('fa-check-circle', 'fas');
+    const isDone = el.classList.contains('fa-check-circle');
+    const parent = el.closest('.checklist-item');
+    
+    if (!isDone) {
+        el.classList.replace('fa-circle', 'fa-check-circle');
+        el.classList.replace('far', 'fas');
         el.style.color = 'var(--success)';
-        el.parentElement.style.opacity = '0.6';
+        parent.style.opacity = '0.6';
+        parent.style.background = '#f8fafc';
     } else {
-        el.classList.remove('fa-check-circle', 'fas');
-        el.classList.add('fa-circle', 'far');
+        el.classList.replace('fa-check-circle', 'fa-circle');
+        el.classList.replace('fas', 'far');
         el.style.color = 'var(--primary)';
-        el.parentElement.style.opacity = '1';
+        parent.style.opacity = '1';
+        parent.style.background = 'white';
     }
 }
 
 function addDoc(bookingId) {
     const item = prompt("Enter additional document name:");
     if (item) {
-        // Simple AJAX-less update for session (In real app, use fetch)
         const container = document.getElementById('checklist-' + bookingId);
         const div = document.createElement('div');
-        div.style.fontSize = '0.75rem';
-        div.style.display = 'flex';
-        div.style.alignItems = 'center';
-        div.style.gap = '0.4rem';
-        div.innerHTML = `<i class="far fa-circle" style="color: var(--primary); cursor: pointer;" onclick="markDone(this)"></i> <span>${item}</span>`;
+        div.className = 'checklist-item';
+        div.innerHTML = `<i class="far fa-circle checklist-icon" style="color: var(--primary);" onclick="markDone(this)"></i> <span>${item}</span>`;
         container.appendChild(div);
 
         // Update Backend
