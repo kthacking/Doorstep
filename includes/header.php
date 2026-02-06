@@ -30,31 +30,31 @@ if ($logged_in) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($page_title) ? $page_title . ' | ' . APP_NAME : APP_NAME; ?></title>
-    <link rel="stylesheet" href="/project/foodapp/assets/css/style.css">
+    <link rel="stylesheet" href="/project/Doorstep/assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="<?php echo $is_agent ? 'agent-portal' : ''; ?>">
     <div class="bg-gradient"></div>
     <nav>
-        <a href="/project/foodapp/index.php" class="logo">
+        <a href="/project/Doorstep/index.php" class="logo">
             <i class="fas fa-hand-holding-heart"></i> Doorstep
         </a>
         <ul class="nav-links">
-            <li><a href="/project/foodapp/index.php">Home</a></li>
+            <li><a href="/project/Doorstep/index.php">Home</a></li>
             
             <?php if (!$logged_in): ?>
-                <li><a href="/project/foodapp/pages/services.php">Services</a></li>
-                <li><a href="/project/foodapp/pages/login.php">Login</a></li>
-                <li><a href="/project/foodapp/pages/register.php" class="nav-btn">Register</a></li>
+                <li><a href="/project/Doorstep/pages/services.php">Services</a></li>
+                <li><a href="/project/Doorstep/pages/login.php">Login</a></li>
+                <li><a href="/project/Doorstep/pages/register.php" class="nav-btn">Register</a></li>
             <?php else: ?>
                 <?php if ($is_user): ?>
-                    <li><a href="/project/foodapp/pages/services.php">Browse Services</a></li>
-                    <li><a href="/project/foodapp/user/dashboard.php">My Bookings</a></li>
-                    <li><a href="/project/foodapp/user/profile.php">My Profile</a></li>
+                    <li><a href="/project/Doorstep/pages/services.php">Browse Services</a></li>
+                    <li><a href="/project/Doorstep/user/dashboard.php">My Bookings</a></li>
+                    <li><a href="/project/Doorstep/user/profile.php">My Profile</a></li>
                 <?php elseif ($is_agent): ?>
-                    <li><a href="/project/foodapp/agent/dashboard.php">My Assignments</a></li>
+                    <li><a href="/project/Doorstep/agent/dashboard.php">My Assignments</a></li>
                 <?php elseif ($is_admin): ?>
-                    <li><a href="/project/foodapp/admin/dashboard.php">Admin Dashboard</a></li>
+                    <li><a href="/project/Doorstep/admin/dashboard.php">Admin Dashboard</a></li>
                 <?php endif; ?>
 
                 <!-- Notification Bell -->
@@ -82,7 +82,7 @@ if ($logged_in) {
                     </div>
                 </li>
 
-                <li><a href="/project/foodapp/actions/logout.php" class="nav-btn" style="background: var(--danger);">Logout</a></li>
+                <li><a href="/project/Doorstep/actions/logout.php" class="nav-btn" style="background: var(--danger);">Logout</a></li>
             <?php endif; ?>
         </ul>
     </nav>
