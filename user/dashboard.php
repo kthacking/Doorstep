@@ -42,15 +42,20 @@ $bookings = $stmt->fetchAll();
                         </div>
                         <div style="text-align: right;">
                             <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);"><?php echo CURRENCY . $booking['total_amount']; ?></div>
-                            <span style="background: rgba(34, 197, 94, 0.1); color: var(--success); padding: 5px 12px; border-radius: 50px; font-weight: 700; font-size: 0.75rem;"><?php echo strtoupper($booking['status']); ?></span>
+                            <?php if ($booking['status'] === 'Cancelled'): ?>
+                                <span style="background: #fef2f2; color: #dc2626; padding: 5px 12px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; border: 1px solid #fecaca;"><?php echo strtoupper($booking['status']); ?></span>
+                            <?php else: ?>
+                                <span style="background: rgba(34, 197, 94, 0.1); color: var(--success); padding: 5px 12px; border-radius: 50px; font-weight: 700; font-size: 0.75rem;"><?php echo strtoupper($booking['status']); ?></span>
+                            <?php endif; ?>
                         </div>
                     </div>
 
                     <?php 
-                    $statuses = ['Booking Placed', 'Agent Assigned', 'En Route', 'Arrived', 'Documents Collected', 'Application Submitted', 'Completed'];
-                    $current_status_index = array_search($booking['status'], $statuses);
+                    $is_cancelled = ($booking['status'] === 'Cancelled');
+                    if (!$is_cancelled):
+                        $statuses = ['Booking Placed', 'Agent Assigned', 'En Route', 'Arrived', 'Documents Collected', 'Application Submitted', 'Completed'];
+                        $current_status_index = array_search($booking['status'], $statuses);
                     ?>
-
                     <div class="stepper">
                         <?php foreach ($statuses as $index => $status): 
                             $class = '';
@@ -69,6 +74,12 @@ $bookings = $stmt->fetchAll();
                             </div>
                         <?php endforeach; ?>
                     </div>
+                    <?php else: ?>
+                        <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 1rem; border-radius: 12px; text-align: center; margin-bottom: 2rem;">
+                            <h3 style="color: #dc2626; font-size: 1rem; margin-bottom: 0.2rem;">Booking Cancelled</h3>
+                            <p style="color: #991b1b; font-size: 0.8rem;">This request has been cancelled.</p>
+                        </div>
+                    <?php endif; ?>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
                         <div style="background: #f8fafc; padding: 1.5rem; border-radius: 15px;">
@@ -106,7 +117,13 @@ $bookings = $stmt->fetchAll();
                             </div>
                         <?php endif; ?>
                     </div>
-                    <div style="margin-top: 1.5rem; text-align: right;">
+                    <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem;">
+                        <?php if (in_array($booking['status'], ['Booking Placed', 'Agent Assigned'])): ?>
+                            <form action="../actions/cancel_booking.php" method="POST" onsubmit="return confirm('<?php echo __('cancel_confirm_msg'); ?>')">
+                                <input type="hidden" name="booking_id" value="<?php echo $booking['id']; ?>">
+                                <button type="submit" class="btn" style="background: #fee2e2; color: #dc2626; padding: 0.6rem 2rem; border: 1px solid #fecaca;"><?php echo __('cancel_booking'); ?></button>
+                            </form>
+                        <?php endif; ?>
                         <a href="booking_details.php?id=<?php echo $booking['id']; ?>" class="btn btn-primary" style="padding: 0.6rem 2rem;">Track Progress & Full Details <i class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>

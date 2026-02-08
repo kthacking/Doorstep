@@ -44,16 +44,34 @@ $current_status_index = array_search($booking['status'], $statuses);
         </div>
         <div style="text-align: right;">
             <div style="font-size: 2rem; font-weight: 700; color: var(--primary);"><?php echo CURRENCY . $booking['total_amount']; ?></div>
-            <?php 
-                $status_key = 'step_' . array_search($booking['status'], ['Booking Placed', 'Agent Assigned', 'En Route', 'Arrived', 'Documents Collected', 'Application Submitted', 'Completed']);
-            ?>
-            <span style="background: rgba(34, 197, 94, 0.1); color: var(--success); padding: 8px 20px; border-radius: 50px; font-weight: 700; text-transform: uppercase;">
-                <?php echo __($status_key); ?>
-            </span>
+            <?php if ($booking['status'] === 'Cancelled'): ?>
+                <span style="background: #fef2f2; color: #dc2626; padding: 8px 20px; border-radius: 50px; font-weight: 700; text-transform: uppercase; border: 1px solid #fecaca;">
+                    Cancelled
+                </span>
+            <?php else: ?>
+                <?php 
+                    $status_key = 'step_' . array_search($booking['status'], ['Booking Placed', 'Agent Assigned', 'En Route', 'Arrived', 'Documents Collected', 'Application Submitted', 'Completed']);
+                ?>
+                <span style="background: rgba(34, 197, 94, 0.1); color: var(--success); padding: 8px 20px; border-radius: 50px; font-weight: 700; text-transform: uppercase;">
+                    <?php echo __($status_key); ?>
+                </span>
+            <?php endif; ?>
         </div>
     </div>
 
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 2rem;">
+        <?php if (in_array($booking['status'], ['Booking Placed', 'Agent Assigned'])): ?>
+            <form action="../actions/cancel_booking.php" method="POST" onsubmit="return confirm('<?php echo __('cancel_confirm_msg'); ?>')">
+                <input type="hidden" name="booking_id" value="<?php echo $booking['id']; ?>">
+                <button type="submit" class="btn" style="background: #fee2e2; color: #dc2626; padding: 0.8rem 2.5rem; border: 1px solid #fecaca; font-weight: 700;">
+                    <i class="fas fa-times-circle"></i> <?php echo __('cancel_booking'); ?>
+                </button>
+            </form>
+        <?php endif; ?>
+    </div>
+
     <!-- Progress Stepper -->
+    <?php if ($booking['status'] !== 'Cancelled'): ?>
     <div class="card" style="margin-bottom: 2rem; padding: 3rem 1rem;">
         <div class="stepper">
             <?php 
@@ -76,6 +94,13 @@ $current_status_index = array_search($booking['status'], $statuses);
             <?php endforeach; ?>
         </div>
     </div>
+    <?php else: ?>
+        <div class="card" style="margin-bottom: 2rem; padding: 3rem; text-align: center; background: #fff1f2;">
+            <i class="fas fa-ban" style="font-size: 4rem; color: #e11d48; margin-bottom: 1rem;"></i>
+            <h2 style="color: #be123c;">This booking has been cancelled</h2>
+            <p style="color: #9f1239;">You cancelled this request. If this was a mistake, please book a new service.</p>
+        </div>
+    <?php endif; ?>
 
     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
         <!-- Left Column: Details -->
