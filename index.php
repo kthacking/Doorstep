@@ -4,14 +4,16 @@ include 'includes/header.php';
 
 // Fetch and Localize services for voice matching
 $all_services = [];
+$service_slugs = [];
 $get_services = $pdo->query("SELECT id, service_name FROM services");
 while($row = $get_services->fetch()) {
     $slug = strtolower(str_replace([' ', '  '], '_', trim($row['service_name'])));
-    // Hardcoded mapping for base services if they don't follow the slug pattern
-    if ($slug == 'pan_card_registration') $slug = 'pan_card';
-    if ($slug == 'birth_certificate_registration') $slug = 'birth_certificate';
+    if (strpos($slug, 'pan') !== false) $slug = 'pan_card';
+    if (strpos($slug, 'birth') !== false) $slug = 'birth_certificate';
+    if (strpos($slug, 'aadhaar') !== false) $slug = 'aadhaar_card';
     
     $all_services[$row['id']] = __($slug);
+    $service_slugs[$row['id']] = $slug;
 }
 ?>
 
@@ -119,6 +121,18 @@ while($row = $get_services->fetch()) {
 
 <script>
 const services = <?php echo json_encode($all_services); ?>;
+const serviceSlugs = <?php echo json_encode($service_slugs); ?>;
+const synonymMap = {
+    'aadhaar_card': ['aadhaar', 'aadhar', 'adhar', 'ஆதார்'],
+    'pan_card': ['pan', 'pan card', 'பான்'],
+    'ration_card': ['ration', 'family card', 'ரேஷன்'],
+    'birth_certificate': ['birth', 'பிறப்பு'],
+    'voter_id': ['voter', 'election', 'வாக்காளர்'],
+    'pension': ['pension', 'ஓய்வூதியம்'],
+    'property_tax': ['property', 'tax', 'சொத்து', 'வரி'],
+    'dl_renewal': ['driving', 'license', 'dl', 'ஓட்டுநர்', 'உரிமம்']
+};
+
 const voiceBtn = document.getElementById('voiceApplyBtn');
 const floatingBtn = document.getElementById('floatingVoiceBtn');
 const floatingLabel = floatingBtn.querySelector('span');
@@ -127,8 +141,8 @@ const vStatus = document.getElementById('voiceStatus');
 const vTranscript = document.getElementById('voiceTranscript');
 const closeVoice = document.getElementById('closeVoice');
 
-let bookingData = { service: '', date: '', time: '' };
-let currentStep = 'service';
+let bookingData = { service: '', serviceName: '', date: '', time: '' };
+let currentStep = 'init';
 
 if ('webkitSpeechRecognition' in window) {
     const recognition = new webkitSpeechRecognition();
@@ -147,8 +161,10 @@ if ('webkitSpeechRecognition' in window) {
     }
 
     const startVoiceFlow = () => {
+        bookingData = { service: '', serviceName: '', date: '', time: '' };
         voiceModal.style.display = 'flex';
-        startConversation();
+        currentStep = 'service';
+        speak(<?php echo json_encode(__('v_prompt_service')); ?>, () => recognition.start());
     };
 
     voiceBtn.onclick = startVoiceFlow;
@@ -169,59 +185,63 @@ if ('webkitSpeechRecognition' in window) {
         synth.cancel();
     };
 
-    function startConversation() {
-        currentStep = 'service';
-        speak(<?php echo json_encode(__('v_prompt_service')); ?>, () => recognition.start());
-    }
+    const extractInfo = (text) => {
+        // Detect Service
+        if (!bookingData.service) {
+            for (let id in serviceSlugs) {
+                const slug = serviceSlugs[id];
+                const keywords = synonymMap[slug] || [];
+                if (keywords.some(k => text.includes(k.toLowerCase())) || text.includes(services[id].toLowerCase())) {
+                    bookingData.service = id;
+                    bookingData.serviceName = services[id];
+                    break;
+                }
+            }
+        }
+
+        // Detect Date
+        if (!bookingData.date) {
+            const dateKeywords = {
+                'tomorrow': ['tomorrow', 'நாளை'],
+                'next week': ['next week', 'அடுத்த வாரம்']
+            };
+            for (let key in dateKeywords) {
+                if (dateKeywords[key].some(k => text.includes(k.toLowerCase()))) {
+                    bookingData.date = key;
+                    break;
+                }
+            }
+        }
+
+        // Detect Time
+        if (!bookingData.time) {
+            const timeKeywords = {
+                'morning': ['morning', '10 am', 'காலை'],
+                'afternoon': ['afternoon', '2 pm', 'மதியம்'],
+                'evening': ['evening', 'evening', '4 pm', '5 pm', 'மாலை']
+            };
+            for (let key in timeKeywords) {
+                if (timeKeywords[key].some(k => text.includes(k.toLowerCase()))) {
+                    bookingData.time = key;
+                    break;
+                }
+            }
+        }
+    };
 
     recognition.onresult = (event) => {
         const text = event.results[0][0].transcript.toLowerCase();
         vTranscript.innerText = `"${text}"`;
         
-        if (currentStep === 'service') {
-            let foundId = null;
-            let foundName = '';
-            for (let id in services) {
-                if (text.includes(services[id].toLowerCase())) {
-                    foundId = id;
-                    foundName = services[id];
-                    bookingData.service = foundId;
-                    bookingData.serviceName = foundName;
-                    break;
-                }
-            }
-            
-            if (foundId) {
-                currentStep = 'date';
-                speak(<?php echo json_encode(__('v_prompt_date')); ?>, () => recognition.start());
-            } else {
-                speak(<?php echo json_encode(__('v_not_found')); ?>, () => recognition.start());
-            }
-        } 
-        else if (currentStep === 'date') {
-            bookingData.date = text;
-            currentStep = 'time';
-            speak(<?php echo json_encode(__('v_prompt_time')); ?>, () => recognition.start());
-        } 
-        else if (currentStep === 'time') {
-            bookingData.time = text;
-            currentStep = 'confirm';
-            
-            let confirmMsg = <?php echo json_encode(__('v_prompt_confirm')); ?>;
-            confirmMsg = confirmMsg.replace('{service}', bookingData.serviceName)
-                                   .replace('{date}', bookingData.date)
-                                   .replace('{time}', bookingData.time);
-            
-            speak(confirmMsg, () => recognition.start());
-        }
-        else if (currentStep === 'confirm') {
+        extractInfo(text);
+
+        if (currentStep === 'confirm') {
             const confirmWord = <?php echo json_encode(__('confirm_keyword')); ?>.toLowerCase();
             const cancelWord = <?php echo json_encode(__('cancel_keyword')); ?>.toLowerCase();
             
             if (text.includes(confirmWord)) {
                 let successMsg = <?php echo json_encode(__('v_confirmed')); ?>;
                 successMsg = successMsg.replace('{service}', bookingData.serviceName);
-                
                 speak(successMsg, () => {
                     const url = new URL('pages/book_service.php', window.location.origin + '/project/Doorstep/');
                     url.searchParams.set('id', bookingData.service);
@@ -230,18 +250,31 @@ if ('webkitSpeechRecognition' in window) {
                     url.searchParams.set('auto_confirm', '1');
                     window.location.href = url.href;
                 });
+                return;
             } else if (text.includes(cancelWord)) {
-                voiceModal.style.display = 'none';
-                recognition.stop();
-                synth.cancel();
-            } else {
-                speak(<?php echo json_encode(__('v_not_found')); ?>, () => recognition.start());
+                closeVoice.click();
+                return;
             }
+        }
+
+        // Flow Control
+        if (!bookingData.service) {
+            speak(<?php echo json_encode(__('v_not_found')); ?>, () => recognition.start());
+        } else if (!bookingData.date || !bookingData.time) {
+            currentStep = 'info';
+            // If we have service but missing detail
+            let prompt = bookingData.date ? <?php echo json_encode(__('v_prompt_time')); ?> : <?php echo json_encode(__('v_got_service')); ?>;
+            speak(prompt, () => recognition.start());
+        } else {
+            currentStep = 'confirm';
+            let confirmMsg = <?php echo json_encode(__('v_prompt_confirm')); ?>;
+            confirmMsg = confirmMsg.replace('{service}', bookingData.serviceName).replace('{date}', bookingData.date).replace('{time}', bookingData.time);
+            speak(confirmMsg, () => recognition.start());
         }
     };
 
     recognition.onerror = () => {
-        speak(<?php echo json_encode(__('v_not_found')); ?>, () => recognition.start());
+        speak(<?php echo json_encode(__('v_miss_info')); ?>, () => recognition.start());
     };
 } else {
     voiceBtn.style.display = 'none';
