@@ -22,17 +22,17 @@ $assignments = $stmt->fetchAll();
 
 <div class="container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1>Agent Portal: <?php echo $_SESSION['agent_name']; ?></h1>
+        <h1><?php echo __('agent_portal'); ?>: <?php echo $_SESSION['agent_name']; ?></h1>
         <div style="background: var(--success); color: white; padding: 0.4rem 0.8rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700;">
-            <i class="fas fa-check-circle"></i> Online & Active
+            <i class="fas fa-check-circle"></i> <?php echo __('online_active'); ?>
         </div>
     </div>
 
     <?php if (empty($assignments)): ?>
         <div class="card" style="text-align: center; padding: 4rem;">
             <i class="fas fa-clipboard-list" style="font-size: 3rem; color: #e2e8f0; margin-bottom: 1rem;"></i>
-            <h3>No Assignments</h3>
-            <p style="color: var(--secondary);">You don't have any active doorstep visits assigned yet.</p>
+            <h3><?php echo __('no_assignments'); ?></h3>
+            <p style="color: var(--secondary);"><?php echo __('no_assignments_desc'); ?></p>
         </div>
     <?php else: ?>
         <div style="display: grid; gap: 1.5rem;">
@@ -56,8 +56,8 @@ $assignments = $stmt->fetchAll();
 
                             <div style="background: #f8fafc; padding: 1rem; border-radius: 12px; margin-top: 1rem;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                    <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--secondary);">Document Checklist</h4>
-                                    <button onclick="addDoc(<?php echo $task['id']; ?>)" class="btn" style="padding: 2px 8px; font-size: 0.65rem; background: var(--primary); color: white;">+ Add Item</button>
+                                    <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--secondary);"><?php echo __('doc_checklist'); ?></h4>
+                                    <button onclick="addDoc(<?php echo $task['id']; ?>)" class="btn" style="padding: 2px 8px; font-size: 0.65rem; background: var(--primary); color: white;">+ <?php echo __('add_item'); ?></button>
                                 </div>
                                 <div id="checklist-<?php echo $task['id']; ?>" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
                                     <?php 
@@ -76,16 +76,16 @@ $assignments = $stmt->fetchAll();
 
                         <div style="border-left: 1px solid #f1f5f9; padding-left: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
                             <div>
-                                <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 0.8rem; letter-spacing: 0.05em;">Contact User</h4>
+                                <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 0.8rem; letter-spacing: 0.05em;"><?php echo __('contact'); ?></h4>
                                 <div class="dual-action-btn-container">
-                                    <a href="tel:<?php echo $task['user_phone']; ?>" class="dual-action-btn call"><i class="fas fa-phone"></i> Call</a>
-                                    <a href="https://wa.me/<?php echo $task['user_phone']; ?>" target="_blank" class="dual-action-btn chat"><i class="fab fa-whatsapp"></i> Chat</a>
+                                    <a href="tel:<?php echo $task['user_phone']; ?>" class="dual-action-btn call"><i class="fas fa-phone"></i> <?php echo __('call'); ?></a>
+                                    <a href="https://wa.me/<?php echo $task['user_phone']; ?>" target="_blank" class="dual-action-btn chat"><i class="fab fa-whatsapp"></i> <?php echo __('chat'); ?></a>
                                 </div>
 
-                                <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 0.5rem; letter-spacing: 0.05em;">Status Tracking</h4>
+                                <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 0.5rem; letter-spacing: 0.05em;"><?php echo __('status'); ?></h4>
                                 <?php 
                                 $status = $task['status'];
-                                $steps = ['Assigned', 'En Route', 'Collected', 'Submitted', 'Completed'];
+                                $steps = [__('step_mini_0'), __('step_mini_1'), __('step_mini_2'), __('step_mini_3'), __('step_mini_4')];
                                 $current_step = 0;
                                 if ($status == 'Agent Assigned') $current_step = 0;
                                 elseif ($status == 'En Route' || $status == 'Arrived') $current_step = 1;
@@ -112,14 +112,17 @@ $assignments = $stmt->fetchAll();
                                     <form action="../actions/confirm_docs.php" method="POST">
                                         <input type="hidden" name="booking_id" value="<?php echo $task['id']; ?>">
                                         <input type="hidden" name="user_type" value="agent">
-                                        <button type="submit" class="btn" style="background: var(--warning); color: white; width: 100%; font-size: 0.75rem; padding: 0.4rem; border-radius: 8px; font-weight: 700;">Confirm Receipt of Docs</button>
+                                    <form action="../actions/confirm_docs.php" method="POST">
+                                        <input type="hidden" name="booking_id" value="<?php echo $task['id']; ?>">
+                                        <input type="hidden" name="user_type" value="agent">
+                                        <button type="submit" class="btn" style="background: var(--warning); color: white; width: 100%; font-size: 0.75rem; padding: 0.4rem; border-radius: 8px; font-weight: 700;"><?php echo __('agent_acceptance'); ?></button>
                                     </form>
                                 <?php endif; ?>
                             </div>
 
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: auto;">
-                                <a href="update_task.php?id=<?php echo $task['id']; ?>" class="btn btn-primary" style="text-align: center; padding: 0.5rem; font-size: 0.75rem;">Update Task</a>
-                                <a href="generate_receipt.php?id=<?php echo $task['id']; ?>" class="btn" style="background: #f8fafc; border: 1px solid #e2e8f0; color: var(--secondary); text-align: center; padding: 0.5rem; font-size: 0.75rem;"><i class="fas fa-file-pdf"></i> PDF</a>
+                                <a href="update_task.php?id=<?php echo $task['id']; ?>" class="btn btn-primary" style="text-align: center; padding: 0.5rem; font-size: 0.75rem;"><?php echo __('update_task_status'); ?></a>
+                                <a href="generate_receipt.php?id=<?php echo $task['id']; ?>" class="btn" style="background: #f8fafc; border: 1px solid #e2e8f0; color: var(--secondary); text-align: center; padding: 0.5rem; font-size: 0.75rem;"><i class="fas fa-file-pdf"></i> Receipt</a>
                             </div>
                         </div>
                     </div>
