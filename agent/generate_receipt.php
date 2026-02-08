@@ -1,5 +1,6 @@
 <?php
 require_once '../config/db.php';
+require_once __DIR__ . '/../includes/lang.php';
 
 // Allow both users and agents to view the receipt
 $allowed = false;
@@ -207,15 +208,15 @@ if (!$data['user_doc_confirmed'] || !$data['agent_doc_confirmed']) {
 </head>
 <body>
     <div class="no-print">
-        <button onclick="window.print()" style="padding: 14px 40px; background: #1e293b; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; font-family: inherit;">
-            <i class="fas fa-print"></i> PRINT ACKNOWLEDGMENT
+        <button id="printBtn" onclick="window.print()" style="padding: 14px 40px; background: #1e293b; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; font-family: inherit;">
+            <i class="fas fa-print"></i> <?php echo strtoupper(__('print_ack')); ?>
         </button>
     </div>
 
     <div class="receipt-container">
         <!-- Official Stamp -->
         <div class="official-stamp">
-            <div><?php echo ($data['status'] === 'Completed') ? 'DOCUMENTS RETURNED' : 'DOCS RECEIVED'; ?></div>
+            <div><?php echo ($data['status'] === 'Completed') ? __('docs_returned') : __('docs_received'); ?></div>
             <div style="font-size: 14px; margin: 4px 0;">DOORSTEP CARE</div>
             <div class="stamp-date"><?php echo date('d-m-Y'); ?></div>
         </div>
@@ -226,69 +227,73 @@ if (!$data['user_doc_confirmed'] || !$data['agent_doc_confirmed']) {
                 <div style="font-size: 12px; color: #64748b; font-weight: 600; margin-top: 4px;">GOVERNMENT SERVICE ASSISTANCE PANEL</div>
             </div>
             <div class="status-header">
-                <div class="status-badge"><?php echo $data['status']; ?></div>
+                <?php 
+                    $stat_map = ['Booking Placed', 'Agent Assigned', 'En Route', 'Arrived', 'Documents Collected', 'Application Submitted', 'Completed'];
+                    $idx = array_search($data['status'], $stat_map);
+                    $status_key = ($idx !== false) ? 'step_' . $idx : 'status_pending';
+                ?>
+                <div class="status-badge"><?php echo __($status_key); ?></div>
                 <div style="margin-top: 10px; font-size: 16px; font-weight: 800;">REF #<?php echo str_pad($booking_id, 5, '0', STR_PAD_LEFT); ?></div>
             </div>
         </div>
 
         <div class="service-highlight">
-            <div class="section-title">Acknowledged Service</div>
+            <div class="section-title"><?php echo __('acknowledged_service'); ?></div>
             <div style="font-size: 24px; font-weight: 800; color: #1e293b;"><?php echo $data['service_name']; ?></div>
             <p style="font-size: 14px; color: #64748b; margin-top: 10px; line-height: 1.6;">
-                This document serves as formal confirmation of the secure handover of personal records for processing. 
-                All documents listed below have been verified for completeness and authenticity by our certified agents.
+                <?php echo __('ack_desc'); ?>
             </p>
         </div>
 
         <div class="section details-grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
             <div>
-                <div class="section-title">Customer Details</div>
+                <div class="section-title"><?php echo __('customer_details'); ?></div>
                 <div style="margin-bottom: 12px;">
-                    <div class="info-label">FULL NAME</div>
+                    <div class="info-label"><?php echo __('full_name'); ?></div>
                     <div class="info-value"><?php echo $data['user_name']; ?></div>
                 </div>
                 <div>
-                    <div class="info-label">CONTACT</div>
+                    <div class="info-label"><?php echo __('contact'); ?></div>
                     <div class="info-value" style="font-size: 13px;"><?php echo $data['user_phone']; ?></div>
                 </div>
             </div>
             <div>
-                <div class="section-title">Agent Details</div>
+                <div class="section-title"><?php echo __('agent_details'); ?></div>
                 <div style="margin-bottom: 12px;">
-                    <div class="info-label">AGENT NAME</div>
+                    <div class="info-label"><?php echo __('agent_name'); ?></div>
                     <div class="info-value"><?php echo $data['agent_name']; ?></div>
                 </div>
                 <div>
-                    <div class="info-label">AGENT ID</div>
+                    <div class="info-label"><?php echo __('agent_id'); ?></div>
                     <div class="info-value" style="font-size: 13px;"><?php echo str_pad($data['agent_id'], 4, '0', STR_PAD_LEFT); ?></div>
                 </div>
             </div>
             <div>
-                <div class="section-title">Service Window</div>
+                <div class="section-title"><?php echo __('service_window'); ?></div>
                 <div style="margin-bottom: 12px;">
-                    <div class="info-label">VISIT DATE</div>
+                    <div class="info-label"><?php echo __('visit_date'); ?></div>
                     <div class="info-value"><?php echo date('d M Y', strtotime($data['booking_date'])); ?></div>
                 </div>
                 <div>
-                    <div class="info-label">TIME SLOT</div>
+                    <div class="info-label"><?php echo __('time_slot'); ?></div>
                     <div class="info-value" style="font-size: 13px;"><?php echo $data['time_slot']; ?></div>
                 </div>
             </div>
         </div>
 
         <div class="section" style="margin-top: -10px;">
-            <div class="section-title">Registered Address</div>
+            <div class="section-title"><?php echo __('registered_address'); ?></div>
             <div class="info-value" style="font-size: 14px; color: #475569; font-weight: 500; font-style: italic;"><?php echo $data['user_address']; ?></div>
         </div>
 
         <div class="section">
-            <div class="section-title">Verified Records Checklist</div>
+            <div class="section-title"><?php echo __('verified_checklist'); ?></div>
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 50px;">NO.</th>
-                        <th>DOCUMENT NAME</th>
-                        <th style="text-align: right;">STATUS</th>
+                        <th style="width: 50px;"><?php echo __('no'); ?></th>
+                        <th><?php echo __('document_name'); ?></th>
+                        <th style="text-align: right;"><?php echo __('status'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -302,7 +307,7 @@ if (!$data['user_doc_confirmed'] || !$data['agent_doc_confirmed']) {
                             <td style="font-weight: 700; color: #94a3b8;"><?php echo str_pad($count++, 2, '0', STR_PAD_LEFT); ?></td>
                             <td style="font-weight: 600;"><?php echo trim($doc); ?></td>
                             <td style="text-align: right; color: #059669; font-weight: 800; font-size: 11px;">
-                                <i class="fas fa-check"></i> RECEIVED
+                                <i class="fas fa-check"></i> <?php echo __('received'); ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -315,21 +320,21 @@ if (!$data['user_doc_confirmed'] || !$data['agent_doc_confirmed']) {
                 <div class="sig-line">
                     <div class="agent-sig"><?php echo $data['agent_name']; ?></div>
                 </div>
-                <div style="font-size: 12px; font-weight: 700; text-transform: uppercase;">Agent Digital Signature</div>
+                <div style="font-size: 12px; font-weight: 700; text-transform: uppercase;"><?php echo __('agent_digital_sig'); ?></div>
                 <div style="font-size: 10px; color: #94a3b8; margin-top: 4px;">ID: <?php echo $booking_id . '/' . substr($data['agent_name'], 0, 3) . '-' . date('y'); ?></div>
             </div>
             <div class="sig-box">
                 <div class="sig-line">
                     <div class="customer-guide"><?php echo $data['user_name']; ?></div>
                 </div>
-                <div style="font-size: 12px; font-weight: 700; text-transform: uppercase;">Customer Signature</div>
-                <div style="font-size: 10px; color: #94a3b8; margin-top: 4px;">Sign above to confirm handover</div>
+                <div style="font-size: 12px; font-weight: 700; text-transform: uppercase;"><?php echo __('customer_sig'); ?></div>
+                <div style="font-size: 10px; color: #94a3b8; margin-top: 4px;"><?php echo __('sig_confirm'); ?></div>
             </div>
         </div>
 
         <div style="margin-top: 60px; padding-top: 30px; border-top: 1px solid #f1f5f9; text-align: center;">
             <div style="font-size: 10px; color: #94a3b8; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
-                Digitally Generated Official Acknowledgment &bull; Hash: <?php echo substr(sha1($booking_id), 0, 16); ?>
+                <?php echo __('digital_ack'); ?> &bull; Hash: <?php echo substr(sha1($booking_id), 0, 16); ?>
             </div>
         </div>
     </div>
