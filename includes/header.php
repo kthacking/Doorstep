@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/lang.php';
 
 $role = $_SESSION['role'] ?? null;
 $logged_in = isset($_SESSION['user_id']) || isset($_SESSION['agent_id']);
@@ -40,17 +41,36 @@ if ($logged_in) {
             <i class="fas fa-hand-holding-heart"></i> Doorstep
         </a>
         <ul class="nav-links">
-            <li><a href="/project/Doorstep/index.php">Home</a></li>
+            <li class="lang-selector" style="position: relative; margin-right: 1rem;">
+                <div style="cursor: pointer; font-size: 0.8rem; font-weight: 700; color: var(--secondary); background: #f1f5f9; padding: 5px 12px; border-radius: 50px;">
+                    <i class="fas fa-globe"></i> <?php echo strtoupper($lang); ?>
+                </div>
+                <div class="lang-dropdown" style="display: none; position: absolute; top: 100%; right: 0; background: white; box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-radius: 12px; padding: 0.5rem; z-index: 1000; min-width: 120px; margin-top: 10px;">
+                    <a href="?lang=en" style="display: block; padding: 8px 12px; color: var(--dark); font-size: 0.85rem; border-radius: 8px;">English</a>
+                    <a href="?lang=hi" style="display: block; padding: 8px 12px; color: var(--dark); font-size: 0.85rem; border-radius: 8px;">हिंदी (Hindi)</a>
+                    <a href="?lang=ta" style="display: block; padding: 8px 12px; color: var(--dark); font-size: 0.85rem; border-radius: 8px;">தமிழ் (Tamil)</a>
+                </div>
+            </li>
+            <script>
+                document.querySelector('.lang-selector').onclick = (e) => {
+                    const dropdown = document.querySelector('.lang-dropdown');
+                    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+                    e.stopPropagation();
+                };
+                window.onclick = () => document.querySelector('.lang-dropdown').style.display = 'none';
+            </script>
+
+            <li><a href="/project/Doorstep/index.php"><?php echo __('home'); ?></a></li>
             
             <?php if (!$logged_in): ?>
-                <li><a href="/project/Doorstep/pages/services.php">Services</a></li>
-                <li><a href="/project/Doorstep/pages/login.php">Login</a></li>
-                <li><a href="/project/Doorstep/pages/register.php" class="nav-btn">Register</a></li>
+                <li><a href="/project/Doorstep/pages/services.php"><?php echo __('services'); ?></a></li>
+                <li><a href="/project/Doorstep/pages/login.php"><?php echo __('login'); ?></a></li>
+                <li><a href="/project/Doorstep/pages/register.php" class="nav-btn"><?php echo __('register'); ?></a></li>
             <?php else: ?>
                 <?php if ($is_user): ?>
-                    <li><a href="/project/Doorstep/pages/services.php">Browse Services</a></li>
-                    <li><a href="/project/Doorstep/user/dashboard.php">My Bookings</a></li>
-                    <li><a href="/project/Doorstep/user/profile.php">My Profile</a></li>
+                    <li><a href="/project/Doorstep/pages/services.php"><?php echo __('services'); ?></a></li>
+                    <li><a href="/project/Doorstep/user/dashboard.php"><?php echo __('my_bookings'); ?></a></li>
+                    <li><a href="/project/Doorstep/user/profile.php"><?php echo __('my_profile'); ?></a></li>
                 <?php elseif ($is_agent): ?>
                     <li><a href="/project/Doorstep/agent/dashboard.php">My Assignments</a></li>
                 <?php elseif ($is_admin): ?>
