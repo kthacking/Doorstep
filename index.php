@@ -11,6 +11,11 @@ while($row = $get_services->fetch()) {
     if (strpos($slug, 'pan') !== false) $slug = 'pan_card';
     if (strpos($slug, 'birth') !== false) $slug = 'birth_certificate';
     if (strpos($slug, 'aadhaar') !== false) $slug = 'aadhaar_card';
+    if (strpos($slug, 'loss') !== false) $slug = 'loss_edu_records_certificate';
+    if (strpos($slug, 'farmer') !== false) $slug = 'farmer_certificate';
+    if (strpos($slug, 'pawn') !== false) $slug = 'pawn_broker_licence';
+    if (strpos($slug, 'lender') !== false) $slug = 'money_lender_licence';
+    if (strpos($slug, 'inter-caste') !== false || strpos($slug, 'intercaste') !== false) $slug = 'intercaste_marriage_certificate';
     
     $all_services[$row['id']] = __($slug);
     $service_slugs[$row['id']] = $slug;
@@ -130,7 +135,27 @@ const synonymMap = {
     'voter_id': ['voter', 'election', 'வாக்காளர்'],
     'pension': ['pension', 'ஓய்வூதியம்'],
     'property_tax': ['property', 'tax', 'சொத்து', 'வரி'],
-    'dl_renewal': ['driving', 'license', 'dl', 'ஓட்டுநர்', 'உரிமம்']
+    'dl_renewal': ['driving', 'license', 'dl', 'ஓட்டுநர்', 'உரிமம்'],
+    'community_certificate': ['community', 'caste', 'சாதி'],
+    'nativity_certificate': ['nativity', 'origin', 'இருப்பிடம்', 'பிறப்பிடம்'],
+    'income_certificate': ['income', 'salary', 'வருமானம்'],
+    'first_graduate_certificate': ['first graduate', 'graduate', 'பட்டதாரி'],
+    'deserted_woman_certificate': ['deserted woman', 'deserted', 'கைவிடப்பட்ட பெண்'],
+    'agricultural_income_certificate': ['agricultural income', 'agriculture', 'விவசாய வருமானம்'],
+    'family_migration_certificate': ['migration', 'இடப்பெயர்வு'],
+    'unemployment_certificate': ['unemployment', 'வேலையின்மை'],
+    'widow_certificate': ['widow', 'விதவை'],
+    'loss_edu_records_certificate': ['loss', 'educational records', 'கல்வி ஆவணங்கள்'],
+    'intercaste_marriage_certificate': ['inter-caste', 'marriage', 'கலப்பு திருமணம்'],
+    'legal_heir_certificate': ['legal heir', 'heir', 'வாரிசு'],
+    'obc_certificate': ['obc', 'ஓபிசி'],
+    'residence_certificate': ['residence', 'வசிப்பிடம்'],
+    'farmer_certificate': ['farmer', 'marginal farmer', 'விவசாயி'],
+    'solvency_certificate': ['solvency', 'கடன் தீர்க்கும்'],
+    'no_male_child_certificate': ['no male child', 'ஆண் குழந்தை இல்லை'],
+    'unmarried_certificate': ['unmarried', 'single', 'திருமணமாகாத'],
+    'pawn_broker_licence': ['pawn broker', 'pawn', 'அடகு'],
+    'money_lender_licence': ['money lender', 'money', 'கடன்']
 };
 
 const voiceBtn = document.getElementById('voiceApplyBtn');

@@ -98,11 +98,29 @@ VALUES ('System Admin', 'admin@doorstep.com', '9876543210', '$2y$10$8Wv6pX1l2XyY
 
 -- Sample Services
 INSERT INTO services (service_name, description, required_documents, service_charge, estimated_days, service_type) VALUES
-('PAN Card Apply', 'New PAN card application or correction in existing one.', 'Aadhaar Card, Passport Size Photo, Signature', 250.00, 7, 'Agent-Handled'),
-('Aadhaar Update', 'Update name, address, or mobile number in Aadhaar.', 'Aadhaar Card, Supporting Doc (Electricity bill/Passport)', 150.00, 10, 'In-Person Visit'),
+('PAN Card Registration', 'New PAN card application or correction in existing one.', 'Aadhaar Card, Passport Size Photo, Signature', 250.00, 7, 'Agent-Handled'),
+('Aadhaar Card Update', 'Update name, address, or mobile number in Aadhaar.', 'Aadhaar Card, Supporting Doc (Electricity bill/Passport)', 150.00, 10, 'In-Person Visit'),
 ('Ration Card', 'New ration card application or member addition.', 'Aadhaar Card of all family members, Income Certificate, Photo', 100.00, 15, 'Agent-Handled'),
-('Income Certificate', 'Certificate for official income proof.', 'Aadhaar Card, Salary Slip/Self Declaration, Ration Card', 120.00, 5, 'Remote'),
-('Community Certificate', 'Caste/Community certification for various benefits.', 'Aadhaar Card, Father Community Certificate, School TC', 100.00, 5, 'Remote');
+('Community Certificate', 'Revenue Department service for community/caste certification.', 'Passport size photo,Address proof (Aadhaar / Voter ID),Parent or sibling community certificate,Self-declaration', 60.00, 5, 'Remote'),
+('Nativity Certificate', 'Official proof of residence and origin.', 'Passport size photo,Address proof,Birth certificate or school certificate,Continuous residence self-declaration', 60.00, 5, 'Remote'),
+('Income Certificate', 'Official certification of annual family income.', 'Passport size photo,Address proof,Income proof (salary slip / bank statement),Family card / smart card,Self-declaration', 60.00, 5, 'Remote'),
+('First Graduate Certificate', 'Certification for first-generation graduates in a family.', 'Passport size photo,Address proof,Transfer certificate,Parent self-declaration,Current academic year certificate', 60.00, 7, 'Remote'),
+('Deserted Woman Certificate', 'Certification for social security and welfare benefits.', 'Passport size photo,Address proof,Marriage certificate,Police / court declaration (if applicable),Self-declaration', 60.00, 7, 'Remote'),
+('Agricultural Income Certificate', 'Certification of income derived from agricultural sources.', 'Passport size photo,Address proof,Adangal,Chitta,Self-declaration', 60.00, 7, 'Remote'),
+('Family Migration Certificate', 'Proof of family relocation for administrative purposes.', 'Passport size photo,Address proof,Previous residence proof,Marriage certificate (if applicable),Self-declaration', 60.00, 10, 'Remote'),
+('Unemployment Certificate', 'Proof of current unemployment status for benefits.', 'Passport size photo,Address proof,Educational qualification certificate,Family income certificate,Self-declaration', 60.00, 5, 'Remote'),
+('Widow Certificate', 'Official certification for widow status and benefits.', 'Passport size photo,Address proof,Death certificate of husband,Marriage certificate,Self-declaration', 60.00, 5, 'Remote'),
+('Certificate for Loss of Educational Records', 'Official document required for applying for duplicate educational records.', 'Passport size photo,Address proof,Police complaint copy,Self-declaration', 60.00, 7, 'Remote'),
+('Inter-caste Marriage Certificate', 'Proof of marriage between different community members for government benefits.', 'Passport size photos (husband & wife),Marriage certificate,Community certificates of both,Self-declaration', 60.00, 7, 'Remote'),
+('Legal Heir Certificate', 'Document identifying the legal heirs of a deceased person.', 'Death certificate of deceased,Address proof,Birth certificates of legal heirs,Relationship proof,Self-declaration', 60.00, 15, 'In-Person Visit'),
+('OBC Certificate', 'Other Backward Classes certification for central government benefits.', 'Passport size photo,Address proof,Parent/sibling OBC certificate,Self-declaration', 60.00, 7, 'Remote'),
+('Residence Certificate', 'Proof of current residing address.', 'Passport size photo,Proof of residence,Family card / ration card,Self-declaration', 60.00, 5, 'Remote'),
+('Small / Marginal Farmer Certificate', 'Certification for agricultural subsidies and benefits.', 'Passport size photo,Address proof,Land ownership documents,Adangal,Self-declaration', 60.00, 7, 'Remote'),
+('Solvency Certificate', 'Certification of financial stability for tenders and legal matters.', 'Passport size photo,Address proof,Bank statement,Property documents,Self-declaration', 60.00, 10, 'Remote'),
+('No Male Child Certificate', 'Certification for specific welfare schemes.', 'Passport size photo,Address proof,Birth certificates of children,Self-declaration', 60.00, 7, 'Remote'),
+('Unmarried Certificate', 'Proof of single marital status for official purposes.', 'Passport size photo,Address proof,Age proof,Self-declaration', 60.00, 5, 'Remote'),
+('Licence under Pawn Broker Act', 'Official licence for operating as a pawn broker.', 'Passport size photo,Address proof,Shop ownership / rental agreement,Police verification,Self-declaration', 120.00, 20, 'Agent-Handled'),
+('Money Lender’s Licence', 'Official licence for money lending business.', 'Passport size photo,Address proof,Business proof,Police verification,Self-declaration', 120.00, 20, 'Agent-Handled');
 
 -- Sample Agents (Password: agent123)
 INSERT INTO agents (agent_name, gender, phone, email, password, status, address, profile_summary) VALUES

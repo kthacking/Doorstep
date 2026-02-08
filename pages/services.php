@@ -12,7 +12,14 @@ include '../includes/header.php';
         $stmt = $pdo->query("SELECT * FROM services ORDER BY service_name ASC");
         while ($service = $stmt->fetch()) {
             $slug = strtolower(str_replace([' ', '  '], '_', trim($service['service_name'])));
-            if ($slug == 'pan_card_registration') $slug = 'pan_card';
+            if (strpos($slug, 'pan') !== false) $slug = 'pan_card';
+            if (strpos($slug, 'birth') !== false) $slug = 'birth_certificate';
+            if (strpos($slug, 'aadhaar') !== false) $slug = 'aadhaar_card';
+            if (strpos($slug, 'loss') !== false) $slug = 'loss_edu_records_certificate';
+            if (strpos($slug, 'farmer') !== false) $slug = 'farmer_certificate';
+            if (strpos($slug, 'pawn') !== false) $slug = 'pawn_broker_licence';
+            if (strpos($slug, 'lender') !== false) $slug = 'money_lender_licence';
+            if (strpos($slug, 'inter-caste') !== false || strpos($slug, 'intercaste') !== false) $slug = 'intercaste_marriage_certificate';
             
             $name = __($slug);
             $desc = __($slug . '_desc');
