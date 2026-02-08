@@ -52,16 +52,32 @@ $user_address = $user_stmt->fetchColumn();
                 
                 <div class="form-group">
                     <label><?php echo __('visit_date'); ?></label>
-                    <input type="date" name="booking_date" id="visit_date" class="form-control" required min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>">
+                    <?php 
+                        $default_date = '';
+                        if (isset($_GET['v_date'])) {
+                            $v_date = strtolower($_GET['v_date']);
+                            if (strpos($v_date, 'tomorrow') !== false) {
+                                $default_date = date('Y-m-d', strtotime('+1 day'));
+                            } elseif (strpos($v_date, 'week') !== false) {
+                                $default_date = date('Y-m-d', strtotime('+7 days'));
+                            }
+                        }
+                    ?>
+                    <input type="date" name="booking_date" id="visit_date" class="form-control" required 
+                           min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>" 
+                           value="<?php echo $default_date; ?>">
                 </div>
 
                 <div class="form-group">
                     <label><?php echo __('time_slot'); ?></label>
+                    <?php 
+                        $v_time = isset($_GET['v_time']) ? strtolower($_GET['v_time']) : '';
+                    ?>
                     <select name="time_slot" id="time_slot" class="form-control" required>
                         <option value=""><?php echo __('time_slot'); ?></option>
-                        <option value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM</option>
-                        <option value="12:00 PM - 03:00 PM">12:00 PM - 03:00 PM</option>
-                        <option value="03:00 PM - 06:00 PM">03:00 PM - 06:00 PM</option>
+                        <option value="10:00 AM - 12:00 PM" <?php echo strpos($v_time, 'morning') !== false ? 'selected' : ''; ?>>10:00 AM - 12:00 PM</option>
+                        <option value="12:00 PM - 03:00 PM" <?php echo strpos($v_time, 'afternoon') !== false ? 'selected' : ''; ?>>12:00 PM - 03:00 PM</option>
+                        <option value="03:00 PM - 06:00 PM" <?php echo strpos($v_time, 'evening') !== false ? 'selected' : ''; ?>>03:00 PM - 06:00 PM</option>
                     </select>
                 </div>
 
