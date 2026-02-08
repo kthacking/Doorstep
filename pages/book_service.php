@@ -157,46 +157,55 @@ if ('webkitSpeechRecognition' in window) {
     const recognition = new webkitSpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = false;
-    recognition.lang = 'en-IN';
+    recognition.lang = '<?php echo $lang == 'ta' ? 'ta-IN' : 'en-IN'; ?>';
 
     voiceBtn.onclick = () => {
-        voiceBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> <?php echo __('listening'); ?>';
+        voiceBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> ' + <?php echo json_encode(__('listening')); ?>;
         voiceBtn.style.background = 'var(--danger)';
         recognition.start();
     };
 
     recognition.onresult = (event) => {
         const text = event.results[0][0].transcript.toLowerCase();
-        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> <?php echo __('voice_booking'); ?>';
+        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> ' + <?php echo json_encode(__('voice_booking')); ?>;
         voiceBtn.style.background = 'var(--primary)';
         
         console.log('Voice Command:', text);
         
-        // Smart Voice Mapping
-        if (text.includes('next week')) {
+        // Language-based Smart Mapping
+        const nextWeek = <?php echo json_encode($lang == 'ta' ? 'அடுத்த வாரம்' : 'next week'); ?>.toLowerCase();
+        const tomorrow = <?php echo json_encode($lang == 'ta' ? 'நாளை' : 'tomorrow'); ?>.toLowerCase();
+        
+        if (text.includes(nextWeek)) {
             const date = new Date();
             date.setDate(date.getDate() + 7);
             document.getElementById('visit_date').value = date.toISOString().split('T')[0];
-        } else if (text.includes('tomorrow')) {
+        } else if (text.includes(tomorrow)) {
             const date = new Date();
             date.setDate(date.getDate() + 1);
             document.getElementById('visit_date').value = date.toISOString().split('T')[0];
         }
 
-        if (text.includes('morning')) document.getElementById('time_slot').value = '10:00 AM - 12:00 PM';
-        if (text.includes('afternoon')) document.getElementById('time_slot').value = '12:00 PM - 03:00 PM';
-        if (text.includes('evening')) document.getElementById('time_slot').value = '03:00 PM - 06:00 PM';
-        
-        if (text.includes('female')) document.getElementById('gender').value = 'Female';
-        if (text.includes('male')) document.getElementById('gender').value = 'Male';
+        const morning = <?php echo json_encode($lang == 'ta' ? 'காலை' : 'morning'); ?>.toLowerCase();
+        const afternoon = <?php echo json_encode($lang == 'ta' ? 'மதியம்' : 'afternoon'); ?>.toLowerCase();
+        const evening = <?php echo json_encode($lang == 'ta' ? 'மாலை' : 'evening'); ?>.toLowerCase();
 
-        alert('Voice recognized: "' + text + '". Data filled automatically.');
+        if (text.includes(morning)) document.getElementById('time_slot').value = '10:00 AM - 12:00 PM';
+        if (text.includes(afternoon)) document.getElementById('time_slot').value = '12:00 PM - 03:00 PM';
+        if (text.includes(evening)) document.getElementById('time_slot').value = '03:00 PM - 06:00 PM';
+        
+        const female = <?php echo json_encode($lang == 'ta' ? 'பெண்' : 'female'); ?>.toLowerCase();
+        const male = <?php echo json_encode($lang == 'ta' ? 'ஆண்' : 'male'); ?>.toLowerCase();
+
+        if (text.includes(female)) document.getElementById('gender').value = 'Female';
+        if (text.includes(male)) document.getElementById('gender').value = 'Male';
+
+        alert('Recognized: "' + text + '"');
     };
 
     recognition.onerror = () => {
-        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> <?php echo __('voice_booking'); ?>';
+        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i> ' + <?php echo json_encode(__('voice_booking')); ?>;
         voiceBtn.style.background = 'var(--primary)';
-        alert('Voice recognition failed. Please try again or type manually.');
     };
 } else {
     voiceBtn.style.display = 'none';

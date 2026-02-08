@@ -171,7 +171,7 @@ if ('webkitSpeechRecognition' in window) {
 
     function startConversation() {
         currentStep = 'service';
-        speak("<?php echo __('v_prompt_service'); ?>", () => recognition.start());
+        speak(<?php echo json_encode(__('v_prompt_service')); ?>, () => recognition.start());
     }
 
     recognition.onresult = (event) => {
@@ -193,21 +193,21 @@ if ('webkitSpeechRecognition' in window) {
             
             if (foundId) {
                 currentStep = 'date';
-                speak("<?php echo __('v_prompt_date'); ?>", () => recognition.start());
+                speak(<?php echo json_encode(__('v_prompt_date')); ?>, () => recognition.start());
             } else {
-                speak("<?php echo __('v_not_found'); ?>", () => recognition.start());
+                speak(<?php echo json_encode(__('v_not_found')); ?>, () => recognition.start());
             }
         } 
         else if (currentStep === 'date') {
             bookingData.date = text;
             currentStep = 'time';
-            speak("<?php echo __('v_prompt_time'); ?>", () => recognition.start());
+            speak(<?php echo json_encode(__('v_prompt_time')); ?>, () => recognition.start());
         } 
         else if (currentStep === 'time') {
             bookingData.time = text;
             currentStep = 'confirm';
             
-            let confirmMsg = "<?php echo __('v_prompt_confirm'); ?>";
+            let confirmMsg = <?php echo json_encode(__('v_prompt_confirm')); ?>;
             confirmMsg = confirmMsg.replace('{service}', bookingData.serviceName)
                                    .replace('{date}', bookingData.date)
                                    .replace('{time}', bookingData.time);
@@ -215,11 +215,11 @@ if ('webkitSpeechRecognition' in window) {
             speak(confirmMsg, () => recognition.start());
         }
         else if (currentStep === 'confirm') {
-            const confirmWord = "<?php echo __('confirm_keyword'); ?>".toLowerCase();
-            const cancelWord = "<?php echo __('cancel_keyword'); ?>".toLowerCase();
+            const confirmWord = <?php echo json_encode(__('confirm_keyword')); ?>.toLowerCase();
+            const cancelWord = <?php echo json_encode(__('cancel_keyword')); ?>.toLowerCase();
             
             if (text.includes(confirmWord)) {
-                let successMsg = "<?php echo __('v_confirmed'); ?>";
+                let successMsg = <?php echo json_encode(__('v_confirmed')); ?>;
                 successMsg = successMsg.replace('{service}', bookingData.serviceName);
                 
                 speak(successMsg, () => {
@@ -235,13 +235,13 @@ if ('webkitSpeechRecognition' in window) {
                 recognition.stop();
                 synth.cancel();
             } else {
-                speak("<?php echo __('v_not_found'); ?>", () => recognition.start());
+                speak(<?php echo json_encode(__('v_not_found')); ?>, () => recognition.start());
             }
         }
     };
 
     recognition.onerror = () => {
-        speak("<?php echo __('v_not_found'); ?>", () => recognition.start());
+        speak(<?php echo json_encode(__('v_not_found')); ?>, () => recognition.start());
     };
 } else {
     voiceBtn.style.display = 'none';
