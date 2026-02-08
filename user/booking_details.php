@@ -35,23 +35,30 @@ $current_status_index = array_search($booking['status'], $statuses);
 ?>
 
 <div class="container">
-    <a href="dashboard.php" style="text-decoration: none; color: var(--secondary); margin-bottom: 2rem; display: inline-block;"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    <a href="dashboard.php" style="text-decoration: none; color: var(--secondary); margin-bottom: 2rem; display: inline-block;"><i class="fas fa-arrow-left"></i> <?php echo __('back_dashboard'); ?></a>
 
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3rem;">
         <div>
             <h1 style="font-size: 2.5rem;"><?php echo $booking['service_name']; ?></h1>
-            <p style="color: var(--secondary);">Booking ID: #<?php echo str_pad($booking['id'], 5, '0', STR_PAD_LEFT); ?> | Placed on: <?php echo date('d M Y', strtotime($booking['created_at'])); ?></p>
+            <p style="color: var(--secondary);"><?php echo __('booking_id_label'); ?>: #<?php echo str_pad($booking['id'], 5, '0', STR_PAD_LEFT); ?> | <?php echo __('placed_on'); ?>: <?php echo date('d M Y', strtotime($booking['created_at'])); ?></p>
         </div>
         <div style="text-align: right;">
             <div style="font-size: 2rem; font-weight: 700; color: var(--primary);"><?php echo CURRENCY . $booking['total_amount']; ?></div>
-            <span style="background: rgba(34, 197, 94, 0.1); color: var(--success); padding: 8px 20px; border-radius: 50px; font-weight: 700; text-transform: uppercase;"><?php echo $booking['status']; ?></span>
+            <?php 
+                $status_key = 'step_' . array_search($booking['status'], ['Booking Placed', 'Agent Assigned', 'En Route', 'Arrived', 'Documents Collected', 'Application Submitted', 'Completed']);
+            ?>
+            <span style="background: rgba(34, 197, 94, 0.1); color: var(--success); padding: 8px 20px; border-radius: 50px; font-weight: 700; text-transform: uppercase;">
+                <?php echo __($status_key); ?>
+            </span>
         </div>
     </div>
 
     <!-- Progress Stepper -->
     <div class="card" style="margin-bottom: 2rem; padding: 3rem 1rem;">
         <div class="stepper">
-            <?php foreach ($statuses as $index => $status): 
+            <?php 
+            $status_labels = ['Booking Placed', 'Agent Assigned', 'En Route', 'Arrived', 'Documents Collected', 'Application Submitted', 'Completed'];
+            foreach ($status_labels as $index => $label): 
                 $class = '';
                 if ($index < $current_status_index) $class = 'completed';
                 elseif ($index === $current_status_index) $class = 'active';
@@ -64,7 +71,7 @@ $current_status_index = array_search($booking['status'], $statuses);
                             <?php echo $index + 1; ?>
                         <?php endif; ?>
                     </div>
-                    <div class="step-label"><?php echo $status; ?></div>
+                    <div class="step-label"><?php echo __('step_' . $index); ?></div>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -86,14 +93,14 @@ $current_status_index = array_search($booking['status'], $statuses);
                         <?php endif; ?>
                     </div>
                     <div>
-                        <h3>Service Delivery: <?php echo $booking['service_type']; ?></h3>
+                        <h3><?php echo __('service_delivery'); ?>: <?php echo $booking['service_type']; ?></h3>
                         <p style="font-size: 0.9rem; color: var(--secondary); margin-top: 0.5rem;">
                             <?php if($booking['service_type'] === 'Remote'): ?>
-                                This service is processed digitally. No physical visit is required. Our agents handle the backend submission.
+                                <?php echo __('remote_desc'); ?>
                             <?php elseif($booking['service_type'] === 'In-Person Visit'): ?>
-                                A certified agent will visit your home to verify documents and provide guidance for your application.
+                                <?php echo __('in_person_desc'); ?>
                             <?php else: ?>
-                                Our agent will visit, collect all required documents, and handle the entire submission process on your behalf.
+                                <?php echo __('agent_handled_desc'); ?>
                             <?php endif; ?>
                         </p>
                     </div>
@@ -103,13 +110,13 @@ $current_status_index = array_search($booking['status'], $statuses);
             <!-- Documents Section -->
             <div class="card" style="margin-bottom: 2rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h3 style="font-size: 1.25rem;">Verification Checklist</h3>
+                    <h3 style="font-size: 1.25rem;"><?php echo __('verification_checklist'); ?></h3>
                     <span class="document-badge"><i class="fas fa-shield-alt"></i> Official Verification</span>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                     <div style="background: #f8fafc; padding: 1.25rem; border-radius: 12px;">
-                        <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 1rem; letter-spacing: 0.05em;">Base Documents</h4>
+                        <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 1rem; letter-spacing: 0.05em;"><?php echo __('base_docs'); ?></h4>
                         <ul style="list-style: none; padding: 0;">
                             <?php 
                             $initial_docs = explode(',', $booking['initial_docs']);
@@ -122,7 +129,7 @@ $current_status_index = array_search($booking['status'], $statuses);
                         </ul>
                     </div>
                     <div style="background: #f8fafc; padding: 1.25rem; border-radius: 12px;">
-                        <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 1rem; letter-spacing: 0.05em;">Agent Requirements</h4>
+                        <h4 style="font-size: 0.7rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 1rem; letter-spacing: 0.05em;"><?php echo __('agent_reqs'); ?></h4>
                         <ul style="list-style: none; padding: 0;">
                             <?php 
                             $dyn_docs = explode(',', $booking['dynamic_checklist']);
@@ -141,7 +148,7 @@ $current_status_index = array_search($booking['status'], $statuses);
                                 </li>
                             <?php endforeach; ?>
                             <?php if(!$has_dyn): ?>
-                                <li style="color: #94a3b8; font-size: 0.8rem; font-style: italic; padding-top: 0.5rem;">No additional requirements yet.</li>
+                                <li style="color: #94a3b8; font-size: 0.8rem; font-style: italic; padding-top: 0.5rem;"><?php echo __('no_reqs'); ?></li>
                             <?php endif; ?>
                         </ul>
                     </div>
@@ -150,22 +157,22 @@ $current_status_index = array_search($booking['status'], $statuses);
 
             <!-- Two-Step Confirmation -->
             <div class="card" style="background: #f8fafc; border: 1px dashed var(--primary);">
-                <h3>Document Submission Confirmation</h3>
-                <p style="font-size: 0.9rem; color: var(--secondary); margin-top: 0.5rem;">Both you and the agent must confirm document handover before the final receipt can be generated.</p>
+                <h3><?php echo __('doc_sub_confirm'); ?></h3>
+                <p style="font-size: 0.9rem; color: var(--secondary); margin-top: 0.5rem;"><?php echo __('doc_sub_desc'); ?></p>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
                     <div style="text-align: center; padding: 1.5rem; background: white; border-radius: 15px;">
                         <div style="font-size: 1.5rem; margin-bottom: 1rem;">
                             <?php if($booking['user_doc_confirmed']): ?>
                                 <i class="fas fa-check-circle" style="color: var(--success); font-size: 3rem;"></i>
-                                <h4 style="margin-top: 0.5rem;">You Confirmed</h4>
+                                <h4 style="margin-top: 0.5rem;"><?php echo __('you_confirmed'); ?></h4>
                             <?php else: ?>
                                 <i class="fas fa-user-clock" style="color: #94a3b8; font-size: 3rem;"></i>
-                                <h4 style="margin-top: 0.5rem; color: #94a3b8;">User Confirmation</h4>
+                                <h4 style="margin-top: 0.5rem; color: #94a3b8;"><?php echo __('user_confirm'); ?></h4>
                                 <form action="../actions/confirm_docs.php" method="POST" style="margin-top: 1rem;">
                                     <input type="hidden" name="booking_id" value="<?php echo $booking['id']; ?>">
                                     <input type="hidden" name="user_type" value="user">
-                                    <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">I have given documents</button>
+                                    <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;"><?php echo __('i_have_given_docs'); ?></button>
                                 </form>
                             <?php endif; ?>
                         </div>
@@ -175,10 +182,10 @@ $current_status_index = array_search($booking['status'], $statuses);
                         <div style="font-size: 1.5rem; margin-bottom: 1rem;">
                             <?php if($booking['agent_doc_confirmed']): ?>
                                 <i class="fas fa-check-circle" style="color: var(--success); font-size: 3rem;"></i>
-                                <h4 style="margin-top: 0.5rem;">Agent Confirmed</h4>
+                                <h4 style="margin-top: 0.5rem;"><?php echo __('agent_confirmed'); ?></h4>
                             <?php else: ?>
                                 <i class="fas fa-user-tie" style="color: #94a3b8; font-size: 3rem;"></i>
-                                <h4 style="margin-top: 0.5rem; color: #94a3b8;">Agent Acceptance</h4>
+                                <h4 style="margin-top: 0.5rem; color: #94a3b8;"><?php echo __('agent_acceptance'); ?></h4>
                                 <p style="font-size: 0.75rem; margin-top: 0.5rem; color: var(--secondary);">Agent will confirm once they verify all documents.</p>
                             <?php endif; ?>
                         </div>
@@ -189,8 +196,8 @@ $current_status_index = array_search($booking['status'], $statuses);
                     <div style="margin-top: 2rem; background: rgba(34, 197, 94, 0.1); padding: 1.25rem; border-radius: 12px; display: flex; align-items: center; gap: 1rem;">
                         <i class="fas fa-file-signature" style="color: var(--success); font-size: 1.8rem;"></i>
                         <div style="flex: 1;">
-                            <strong style="color: var(--success); font-size: 1rem;">Submission Verified!</strong>
-                            <p style="font-size: 0.85rem; color: #166534; margin-top: 2px;">The acknowledgment receipt is now available for download.</p>
+                            <strong style="color: var(--success); font-size: 1rem;"><?php echo __('sub_verified'); ?></strong>
+                            <p style="font-size: 0.85rem; color: #166534; margin-top: 2px;"><?php echo __('sub_verified_desc'); ?></p>
                         </div>
                         <a href="../agent/generate_receipt.php?id=<?php echo $booking['id']; ?>" target="_blank" class="btn btn-primary" style="box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);"><i class="fas fa-download"></i> Receipt</a>
                     </div>
@@ -198,8 +205,8 @@ $current_status_index = array_search($booking['status'], $statuses);
                     <div style="margin-top: 2rem; background: #fffbeb; padding: 1.25rem; border-radius: 12px; display: flex; align-items: center; gap: 1rem; border: 1px solid #fde68a;">
                         <i class="fas fa-lock" style="color: #d97706; font-size: 1.8rem;"></i>
                         <div style="flex: 1;">
-                            <strong style="color: #92400e; font-size: 0.9rem;">Waiting for Verification</strong>
-                            <p style="font-size: 0.8rem; color: #b45309; margin-top: 2px;">Receipt will be unlocked once the agent confirms document handover.</p>
+                            <strong style="color: #92400e; font-size: 0.9rem;"><?php echo __('waiting_verification'); ?></strong>
+                            <p style="font-size: 0.8rem; color: #b45309; margin-top: 2px;"><?php echo __('receipt_unlock_desc'); ?></p>
                         </div>
                     </div>
                 <?php endif; ?>
@@ -271,7 +278,7 @@ $current_status_index = array_search($booking['status'], $statuses);
 
                 <!-- Feedback Section -->
                 <div class="card" style="margin-bottom: 2rem; border: 1px solid #f1f5f9; background: #fafafa;">
-                    <h4 style="font-size: 0.8rem; margin-bottom: 1rem;">Rate your experience</h4>
+                    <h4 style="font-size: 0.8rem; margin-bottom: 1rem;"><?php echo __('rate_experience'); ?></h4>
                     <div id="star-rating" style="display: flex; gap: 0.5rem; justify-content: center; font-size: 1.5rem; color: #e2e8f0; margin-bottom: 1rem;">
                         <i class="fas fa-star" data-rating="1" style="cursor: pointer; transition: color 0.2s;"></i>
                         <i class="fas fa-star" data-rating="2" style="cursor: pointer; transition: color 0.2s;"></i>
@@ -279,7 +286,7 @@ $current_status_index = array_search($booking['status'], $statuses);
                         <i class="fas fa-star" data-rating="4" style="cursor: pointer; transition: color 0.2s;"></i>
                         <i class="fas fa-star" data-rating="5" style="cursor: pointer; transition: color 0.2s;"></i>
                     </div>
-                    <button class="btn" style="width: 100%; font-size: 0.75rem; background: transparent; border: 1px solid #e2e8f0; color: var(--secondary);">Write a review</button>
+                    <button class="btn" style="width: 100%; font-size: 0.75rem; background: transparent; border: 1px solid #e2e8f0; color: var(--secondary);"><?php echo __('write_review'); ?></button>
                     
                     <script>
                         const stars = document.querySelectorAll('#star-rating .fa-star');
@@ -315,14 +322,14 @@ $current_status_index = array_search($booking['status'], $statuses);
 <?php else: ?>
                 <div class="card" style="background: #fffbeb; text-align: center;">
                     <i class="fas fa-user-secret" style="font-size: 3rem; color: #f59e0b; margin-bottom: 1rem;"></i>
-                    <h3>Finding Agent</h3>
-                    <p style="font-size: 0.85rem; color: var(--secondary);">We are assigning a professional for your location.</p>
+                    <h3><?php echo __('finding_agent'); ?></h3>
+                    <p style="font-size: 0.85rem; color: var(--secondary);"><?php echo __('finding_agent_desc'); ?></p>
                 </div>
             <?php endif; ?>
 
             <!-- Location Card -->
             <div class="card" style="margin-top: 2rem;">
-                <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 1rem;">Service Location</h4>
+                <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 1rem;"><?php echo __('service_location'); ?></h4>
                 <div style="display: flex; gap: 0.8rem;">
                     <i class="fas fa-map-marker-alt" style="color: var(--primary); margin-top: 4px;"></i>
                     <p style="font-size: 0.9rem; line-height: 1.5;"><?php echo $booking['address_confirmed']; ?></p>
