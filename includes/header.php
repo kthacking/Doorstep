@@ -85,15 +85,20 @@ if ($logged_in) {
                             <span class="notification-badge"><?php echo count($notifs); ?></span>
                         <?php endif; ?>
                     </div>
-                    <div class="notification-dropdown" id="notifDropdown" style="right: 0; left: auto;">
-                        <div style="padding: 0.8rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; font-size: 0.9rem; color: var(--dark);">Notifications</div>
+                    <div class="notification-dropdown" id="notifDropdown" style="right: 0; left: auto; padding-bottom: 0;">
+                        <div style="padding: 0.8rem; border-bottom: 1px solid #f1f5f9; font-weight: 700; font-size: 0.9rem; color: var(--dark); display: flex; justify-content: space-between; align-items: center;">
+                            <?php echo __('notifications'); ?>
+                            <?php if (count($notifs) > 0): ?>
+                                <a href="/project/Doorstep/actions/clear_notifications.php" style="font-size: 0.75rem; color: var(--primary); font-weight: 600;"><?php echo __('clear_all'); ?></a>
+                            <?php endif; ?>
+                        </div>
                         <div style="max-height: 300px; overflow-y: auto;">
                             <?php if (count($notifs) === 0): ?>
-                                <div class="notification-item">No new alerts</div>
+                                <div class="notification-item"><?php echo __('no_notifs'); ?></div>
                             <?php else: ?>
                                 <?php foreach ($notifs as $n): ?>
                                     <div class="notification-item">
-                                        <div style="line-height: 1.4; color: #4b5563;"><?php echo $n['message']; ?></div>
+                                        <div style="line-height: 1.4; color: #4b5563;"><?php echo translate_msg($n['message']); ?></div>
                                         <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 5px;"><i class="far fa-clock"></i> <?php echo date('d M, H:i', strtotime($n['created_at'])); ?></div>
                                     </div>
                                 <?php endforeach; ?>
