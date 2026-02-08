@@ -12,8 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$booking_id, $_SESSION['user_id']]);
             
             // Notify Admin
+            $notif_msg = "notif_user_confirmed_docs::" . json_encode(['id' => $booking_id]);
             $notify = $pdo->prepare("INSERT INTO notifications (user_type, message) VALUES ('admin', ?)");
-            $notify->execute(["User confirmed document handover for Booking (#$booking_id)"]);
+            $notify->execute([$notif_msg]);
             
             header("Location: ../user/booking_details.php?id=$booking_id");
         } elseif ($user_type === 'agent') {
@@ -26,8 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $booking_stmt->execute([$booking_id]);
             $uid = $booking_stmt->fetchColumn();
 
+            $notif_msg = "notif_agent_confirmed_docs::" . json_encode(['id' => $booking_id]);
             $notify = $pdo->prepare("INSERT INTO notifications (user_type, user_id, message) VALUES ('user', ?, ?)");
-            $notify->execute([$uid, "Agent has accepted and confirmed your document submission for booking #$booking_id."]);
+            $notify->execute([$uid, $notif_msg]);
 
             header("Location: ../agent/dashboard.php?success=1");
         }
