@@ -139,6 +139,7 @@ if ('webkitSpeechRecognition' in window) {
     recognition.interimResults = false;
 
     function speak(text, callback) {
+        vStatus.innerText = text;
         const utter = new SpeechSynthesisUtterance(text);
         utter.lang = recognition.lang;
         utter.onend = callback;
@@ -179,10 +180,13 @@ if ('webkitSpeechRecognition' in window) {
         
         if (currentStep === 'service') {
             let foundId = null;
+            let foundName = '';
             for (let id in services) {
                 if (text.includes(services[id].toLowerCase())) {
                     foundId = id;
+                    foundName = services[id];
                     bookingData.service = foundId;
+                    bookingData.serviceName = foundName;
                     break;
                 }
             }
@@ -201,13 +205,38 @@ if ('webkitSpeechRecognition' in window) {
         } 
         else if (currentStep === 'time') {
             bookingData.time = text;
-            speak("<?php echo __('v_success'); ?>", () => {
-                const url = new URL('pages/book_service.php', window.location.origin + '/project/Doorstep/');
-                url.searchParams.set('id', bookingData.service);
-                url.searchParams.set('v_date', bookingData.date);
-                url.searchParams.set('v_time', bookingData.time);
-                window.location.href = url.href;
-            });
+            currentStep = 'confirm';
+            
+            let confirmMsg = "<?php echo __('v_prompt_confirm'); ?>";
+            confirmMsg = confirmMsg.replace('{service}', bookingData.serviceName)
+                                   .replace('{date}', bookingData.date)
+                                   .replace('{time}', bookingData.time);
+            
+            speak(confirmMsg, () => recognition.start());
+        }
+        else if (currentStep === 'confirm') {
+            const confirmWord = "<?php echo __('confirm_keyword'); ?>".toLowerCase();
+            const cancelWord = "<?php echo __('cancel_keyword'); ?>".toLowerCase();
+            
+            if (text.includes(confirmWord)) {
+                let successMsg = "<?php echo __('v_confirmed'); ?>";
+                successMsg = successMsg.replace('{service}', bookingData.serviceName);
+                
+                speak(successMsg, () => {
+                    const url = new URL('pages/book_service.php', window.location.origin + '/project/Doorstep/');
+                    url.searchParams.set('id', bookingData.service);
+                    url.searchParams.set('v_date', bookingData.date);
+                    url.searchParams.set('v_time', bookingData.time);
+                    url.searchParams.set('auto_confirm', '1');
+                    window.location.href = url.href;
+                });
+            } else if (text.includes(cancelWord)) {
+                voiceModal.style.display = 'none';
+                recognition.stop();
+                synth.cancel();
+            } else {
+                speak("<?php echo __('v_not_found'); ?>", () => recognition.start());
+            }
         }
     };
 

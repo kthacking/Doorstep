@@ -55,11 +55,20 @@ $user_address = $user_stmt->fetchColumn();
                     <?php 
                         $default_date = '';
                         if (isset($_GET['v_date'])) {
-                            $v_date = strtolower($_GET['v_date']);
-                            if (strpos($v_date, 'tomorrow') !== false) {
+                            $v_dt = strtolower($_GET['v_date']);
+                            if (strpos($v_dt, 'tomorrow') !== false) {
                                 $default_date = date('Y-m-d', strtotime('+1 day'));
-                            } elseif (strpos($v_date, 'week') !== false) {
+                            } elseif (strpos($v_dt, 'next week') !== false) {
                                 $default_date = date('Y-m-d', strtotime('+7 days'));
+                            } else {
+                                // Try parsing any mentioned date string (e.g. "monday", "february 10")
+                                $parsed = strtotime($v_dt);
+                                if ($parsed && $parsed > time()) {
+                                    $default_date = date('Y-m-d', $parsed);
+                                } else {
+                                    // Default fallback for any input that sounds like a meeting request
+                                    $default_date = date('Y-m-d', strtotime('+1 day'));
+                                }
                             }
                         }
                     ?>
@@ -72,12 +81,20 @@ $user_address = $user_stmt->fetchColumn();
                     <label><?php echo __('time_slot'); ?></label>
                     <?php 
                         $v_time = isset($_GET['v_time']) ? strtolower($_GET['v_time']) : '';
+                        $selected_slot = '';
+                        if (strpos($v_time, 'morning') !== false) $selected_slot = '10:00 AM - 12:00 PM';
+                        elseif (strpos($v_time, 'afternoon') !== false) $selected_slot = '12:00 PM - 03:00 PM';
+                        elseif (strpos($v_time, 'evening') !== false) $selected_slot = '03:00 PM - 06:00 PM';
+                        // Handle specific hour mentions
+                        elseif (preg_match('/10|11/', $v_time)) $selected_slot = '10:00 AM - 12:00 PM';
+                        elseif (preg_match('/1|2|3/', $v_time)) $selected_slot = '12:00 PM - 03:00 PM';
+                        elseif (preg_match('/4|5|6/', $v_time)) $selected_slot = '03:00 PM - 06:00 PM';
                     ?>
                     <select name="time_slot" id="time_slot" class="form-control" required>
                         <option value=""><?php echo __('time_slot'); ?></option>
-                        <option value="10:00 AM - 12:00 PM" <?php echo strpos($v_time, 'morning') !== false ? 'selected' : ''; ?>>10:00 AM - 12:00 PM</option>
-                        <option value="12:00 PM - 03:00 PM" <?php echo strpos($v_time, 'afternoon') !== false ? 'selected' : ''; ?>>12:00 PM - 03:00 PM</option>
-                        <option value="03:00 PM - 06:00 PM" <?php echo strpos($v_time, 'evening') !== false ? 'selected' : ''; ?>>03:00 PM - 06:00 PM</option>
+                        <option value="10:00 AM - 12:00 PM" <?php echo $selected_slot == '10:00 AM - 12:00 PM' ? 'selected' : ''; ?>>10:00 AM - 12:00 PM</option>
+                        <option value="12:00 PM - 03:00 PM" <?php echo $selected_slot == '12:00 PM - 03:00 PM' ? 'selected' : ''; ?>>12:00 PM - 03:00 PM</option>
+                        <option value="03:00 PM - 06:00 PM" <?php echo $selected_slot == '03:00 PM - 06:00 PM' ? 'selected' : ''; ?>>03:00 PM - 06:00 PM</option>
                     </select>
                 </div>
 
@@ -199,6 +216,22 @@ document.getElementById('bookingForm').onchange = function() {
         document.querySelectorAll('.doc-rule-item i').forEach(icon => {
             icon.style.color = 'var(--success)';
         });
+    }
+};
+
+// Auto-Confirm Handling
+window.onload = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('auto_confirm') === '1') {
+        const date = document.getElementById('visit_date').value;
+        const slot = document.getElementById('time_slot').value;
+        const addr = document.getElementById('address').value;
+
+        if (date && slot && addr) {
+            setTimeout(() => {
+                document.getElementById('bookingForm').submit();
+            }, 1000);
+        }
     }
 };
 </script>
