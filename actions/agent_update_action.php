@@ -36,14 +36,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $log = $pdo->prepare("INSERT INTO status_logs (booking_id, status, remarks) VALUES (?, ?, ?)");
         $log->execute([$booking_id, $status, $remarks]);
 
-        // Notify User with Service Name
-        $msg = "Update on your $service_name (#$booking_id): Status changed to '$status'. Note: $remarks";
+        // Notify User with Key-based localization
+        $notif_key = 'notif_completed'; // default fallback
+        if ($status === 'Arrived') $notif_key = 'notif_agent_arrived';
+        if ($status === 'Documents Collected') $notif_key = 'notif_docs_collected';
+        if ($status === 'Application Submitted') $notif_key = 'notif_application_submitted';
+        if ($status === 'Completed') $notif_key = 'notif_completed';
+
+        $msg = $notif_key . "::" . json_encode([
+            'agent' => $_SESSION['agent_name'],
+            'service' => $service_name,
+            'id' => $booking_id
+        ]);
+
         $notify = $pdo->prepare("INSERT INTO notifications (user_type, user_id, message) VALUES ('user', ?, ?)");
         $notify->execute([$booking['user_id'], $msg]);
 
         // Notify Admin if completed
         if ($status == 'Completed') {
-            $admin_msg = "$service_name (#$booking_id) has been marked as Completed by " . $_SESSION['agent_name'];
+            $admin_msg = "notif_completed::" . json_encode(['service' => $service_name, 'id' => $booking_id]);
             $notify_admin = $pdo->prepare("INSERT INTO notifications (user_type, message) VALUES ('admin', ?)");
             $notify_admin->execute([$admin_msg]);
         }
