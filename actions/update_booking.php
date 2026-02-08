@@ -37,13 +37,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $log_stmt->execute([$booking_id, $status, $remarks]);
 
         // Notify User
-        $user_msg = "Admin update on your $service_name (#$booking_id): $status. Note: $remarks";
+        $user_msg = "notif_agent_assigned::" . json_encode([
+            'agent' => $agent_id ? ($pdo->query("SELECT agent_name FROM agents WHERE id = $agent_id")->fetchColumn()) : 'None',
+            'service' => $service_name,
+            'id' => $booking_id
+        ]);
         $notify_user = $pdo->prepare("INSERT INTO notifications (user_type, user_id, message) VALUES ('user', ?, ?)");
         $notify_user->execute([$booking['user_id'], $user_msg]);
 
         // If agent assigned, notify agent
         if ($agent_id) {
-            $agent_msg = "New Task Assigned: $service_name (#$booking_id). Please check your dashboard.";
+            $agent_msg = "notif_agent_assigned::" . json_encode([
+                'agent' => 'You',
+                'service' => $service_name,
+                'id' => $booking_id
+            ]);
             $notify_agent = $pdo->prepare("INSERT INTO notifications (user_type, user_id, message) VALUES ('agent', ?, ?)");
             $notify_agent->execute([$agent_id, $agent_msg]);
         }
