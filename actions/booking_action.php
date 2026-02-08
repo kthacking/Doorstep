@@ -35,9 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $log_stmt = $pdo->prepare("INSERT INTO status_logs (booking_id, status, remarks) VALUES (?, 'Booking Placed', 'Your booking has been received and is waiting for agent assignment.')");
         $log_stmt->execute([$booking_id]);
 
-        // Notify Admin with User and Service Name
+        // Notify Admin with User and Service Name (Key-based for multilingual support)
+        $notif_msg = "notif_new_booking::" . json_encode(['service' => $service_name, 'id' => $booking_id, 'user' => $_SESSION['user_name']]);
         $notify = $pdo->prepare("INSERT INTO notifications (user_type, message) VALUES ('admin', ?)");
-        $notify->execute(["New $service_name booking (#$booking_id) by " . $_SESSION['user_name']]);
+        $notify->execute([$notif_msg]);
 
         $pdo->commit();
         
