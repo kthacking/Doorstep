@@ -89,6 +89,7 @@ $agents = $pdo->query("SELECT * FROM agents ORDER BY status DESC, applied_at DES
                             <?php if($a['status'] == 'pending'): ?>
                                 <a href="../actions/agent_action.php?approve=<?php echo $a['id']; ?>" class="btn" style="background: var(--success); color: white; padding: 0.3rem 0.8rem; font-size: 0.8rem; border-radius: 5px;">Approve</a>
                             <?php endif; ?>
+                            <a href="javascript:void(0)" onclick="openPassModal(<?php echo $a['id']; ?>, '<?php echo $a['agent_name']; ?>')" style="color: var(--primary); font-size: 0.9rem; margin-left: 1rem;"><i class="fas fa-key"></i></a>
                             <a href="../actions/agent_action.php?delete=<?php echo $a['id']; ?>" style="color: var(--danger); font-size: 0.9rem; margin-left: 1rem;" onclick="return confirm('Are you sure?')"><i class="fas fa-trash"></i></a>
                         </td>
                     </tr>
@@ -98,10 +99,38 @@ $agents = $pdo->query("SELECT * FROM agents ORDER BY status DESC, applied_at DES
     </div>
 </div>
 
+<!-- Password Change Modal -->
+<div id="passModal" class="modal" style="display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; background: rgba(0,0,0,0.5);">
+    <div style="background: white; width: 400px; margin: 15% auto; padding: 2rem; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+        <h3 id="modalAgentName">Change Password</h3>
+        <form action="../actions/agent_action.php" method="POST" style="margin-top: 1.5rem;">
+            <input type="hidden" name="agent_id" id="modalAgentId">
+            <div class="form-group">
+                <label>New Password</label>
+                <input type="password" name="new_password" class="form-control" placeholder="Enter new password" required>
+            </div>
+            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                <button type="submit" name="change_password" class="btn btn-primary" style="flex: 1;">Update Password</button>
+                <button type="button" onclick="closePassModal()" class="btn" style="flex: 1; background: #f1f5f9;">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
 function toggleForm() {
     const form = document.getElementById('addAgentForm');
     form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+function openPassModal(id, name) {
+    document.getElementById('modalAgentId').value = id;
+    document.getElementById('modalAgentName').innerText = "Update Password: " + name;
+    document.getElementById('passModal').style.display = 'block';
+}
+
+function closePassModal() {
+    document.getElementById('passModal').style.display = 'none';
 }
 </script>
 

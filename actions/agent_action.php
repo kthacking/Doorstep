@@ -42,4 +42,13 @@ if (isset($_GET['delete'])) {
     $stmt->execute([$id]);
     header("Location: ../admin/manage_agents.php");
 }
+
+if (isset($_POST['change_password'])) {
+    $id = $_POST['agent_id'];
+    $new_pw = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
+    
+    $stmt = $pdo->prepare("UPDATE agents SET password = ? WHERE id = ?");
+    $stmt->execute([$new_pw, $id]);
+    header("Location: ../admin/manage_agents.php?success=password_changed");
+}
 ?>
